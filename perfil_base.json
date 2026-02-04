@@ -3646,5 +3646,1860 @@
                 "ram_mb": 18.62
             }
         ]
+    },
+    {
+        "fecha": "2026-02-04 19:53:31",
+        "cpu_percent": 69.1,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.84,
+        "ram_percent": 88.9,
+        "procesos": [
+            {
+                "pid": 0,
+                "nombre": "System Idle Process",
+                "ram_mb": 0.01
+            },
+            {
+                "pid": 4,
+                "nombre": "System",
+                "ram_mb": 1.31
+            },
+            {
+                "pid": 92,
+                "nombre": "",
+                "ram_mb": 31.57
+            },
+            {
+                "pid": 136,
+                "nombre": "Registry",
+                "ram_mb": 16.67
+            },
+            {
+                "pid": 292,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.4
+            },
+            {
+                "pid": 544,
+                "nombre": "smss.exe",
+                "ram_mb": 0.0
+            },
+            {
+                "pid": 588,
+                "nombre": "winlogon.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 652,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.61
+            },
+            {
+                "pid": 688,
+                "nombre": "chrome.exe",
+                "ram_mb": 98.66
+            },
+            {
+                "pid": 868,
+                "nombre": "csrss.exe",
+                "ram_mb": 1.08
+            },
+            {
+                "pid": 980,
+                "nombre": "wininit.exe",
+                "ram_mb": 0.0
+            },
+            {
+                "pid": 992,
+                "nombre": "csrss.exe",
+                "ram_mb": 1.2
+            },
+            {
+                "pid": 1036,
+                "nombre": "services.exe",
+                "ram_mb": 6.01
+            },
+            {
+                "pid": 1048,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.26
+            },
+            {
+                "pid": 1072,
+                "nombre": "LsaIso.exe",
+                "ram_mb": 0.0
+            },
+            {
+                "pid": 1092,
+                "nombre": "lsass.exe",
+                "ram_mb": 11.9
+            },
+            {
+                "pid": 1160,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 20.89
+            },
+            {
+                "pid": 1220,
+                "nombre": "svchost.exe",
+                "ram_mb": 17.37
+            },
+            {
+                "pid": 1252,
+                "nombre": "WUDFHost.exe",
+                "ram_mb": 1.03
+            },
+            {
+                "pid": 1260,
+                "nombre": "fontdrvhost.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 1264,
+                "nombre": "fontdrvhost.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 1396,
+                "nombre": "svchost.exe",
+                "ram_mb": 12.32
+            },
+            {
+                "pid": 1476,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.9
+            },
+            {
+                "pid": 1560,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 7.68
+            },
+            {
+                "pid": 1568,
+                "nombre": "WUDFHost.exe",
+                "ram_mb": 0.48
+            },
+            {
+                "pid": 1592,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.07
+            },
+            {
+                "pid": 1652,
+                "nombre": "dwm.exe",
+                "ram_mb": 69.01
+            },
+            {
+                "pid": 1696,
+                "nombre": "svchost.exe",
+                "ram_mb": 9.7
+            },
+            {
+                "pid": 1728,
+                "nombre": "WUDFHost.exe",
+                "ram_mb": 1.01
+            },
+            {
+                "pid": 1760,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.46
+            },
+            {
+                "pid": 1820,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.0
+            },
+            {
+                "pid": 1828,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.57
+            },
+            {
+                "pid": 1856,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.18
+            },
+            {
+                "pid": 1868,
+                "nombre": "PowerToys.FancyZones.exe",
+                "ram_mb": 2.63
+            },
+            {
+                "pid": 1876,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.47
+            },
+            {
+                "pid": 1948,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.66
+            },
+            {
+                "pid": 1968,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.98
+            },
+            {
+                "pid": 1976,
+                "nombre": "PowerToys.CropAndLock.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 2004,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.57
+            },
+            {
+                "pid": 2120,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.18
+            },
+            {
+                "pid": 2164,
+                "nombre": "Discord.exe",
+                "ram_mb": 98.36
+            },
+            {
+                "pid": 2200,
+                "nombre": "IntelCpHDCPSvc.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 2244,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.59
+            },
+            {
+                "pid": 2252,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.14
+            },
+            {
+                "pid": 2288,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.59
+            },
+            {
+                "pid": 2316,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.18
+            },
+            {
+                "pid": 2368,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.19
+            },
+            {
+                "pid": 2376,
+                "nombre": "Discord.exe",
+                "ram_mb": 1.45
+            },
+            {
+                "pid": 2388,
+                "nombre": "svchost.exe",
+                "ram_mb": 8.15
+            },
+            {
+                "pid": 2400,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.62
+            },
+            {
+                "pid": 2416,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 65.92
+            },
+            {
+                "pid": 2424,
+                "nombre": "SDXHelper.exe",
+                "ram_mb": 4.16
+            },
+            {
+                "pid": 2476,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.57
+            },
+            {
+                "pid": 2488,
+                "nombre": "svchost.exe",
+                "ram_mb": 5.21
+            },
+            {
+                "pid": 2500,
+                "nombre": "igfxCUIServiceN.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 2556,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.82
+            },
+            {
+                "pid": 2672,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.63
+            },
+            {
+                "pid": 2760,
+                "nombre": "gamingservicesnet.exe",
+                "ram_mb": 0.53
+            },
+            {
+                "pid": 2816,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.47
+            },
+            {
+                "pid": 2832,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.05
+            },
+            {
+                "pid": 2844,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.61
+            },
+            {
+                "pid": 2996,
+                "nombre": "gamingservices.exe",
+                "ram_mb": 14.45
+            },
+            {
+                "pid": 3088,
+                "nombre": "svchost.exe",
+                "ram_mb": 5.1
+            },
+            {
+                "pid": 3128,
+                "nombre": "RuntimeBroker.exe",
+                "ram_mb": 1.46
+            },
+            {
+                "pid": 3188,
+                "nombre": "dasHost.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 3208,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.61
+            },
+            {
+                "pid": 3224,
+                "nombre": "UserOOBEBroker.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 3256,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.63
+            },
+            {
+                "pid": 3284,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 1.82
+            },
+            {
+                "pid": 3312,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.11
+            },
+            {
+                "pid": 3384,
+                "nombre": "WUDFHost.exe",
+                "ram_mb": 0.55
+            },
+            {
+                "pid": 3460,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.91
+            },
+            {
+                "pid": 3476,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.27
+            },
+            {
+                "pid": 3576,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 382.81
+            },
+            {
+                "pid": 3624,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.14
+            },
+            {
+                "pid": 3636,
+                "nombre": "MemCompression",
+                "ram_mb": 94.16
+            },
+            {
+                "pid": 3656,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.7
+            },
+            {
+                "pid": 3684,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 0.37
+            },
+            {
+                "pid": 3692,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.39
+            },
+            {
+                "pid": 3724,
+                "nombre": "AppHelperCap.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 3748,
+                "nombre": "DiagsCap.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 3768,
+                "nombre": "NetworkCap.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 3784,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 13.09
+            },
+            {
+                "pid": 3788,
+                "nombre": "SysInfoCap.exe",
+                "ram_mb": 19.33
+            },
+            {
+                "pid": 3796,
+                "nombre": "TouchpointAnalyticsClientService.exe",
+                "ram_mb": 8.91
+            },
+            {
+                "pid": 3940,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.11
+            },
+            {
+                "pid": 3980,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.74
+            },
+            {
+                "pid": 4028,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 1.95
+            },
+            {
+                "pid": 4048,
+                "nombre": "Discord.exe",
+                "ram_mb": 15.25
+            },
+            {
+                "pid": 4056,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.11
+            },
+            {
+                "pid": 4076,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.53
+            },
+            {
+                "pid": 4168,
+                "nombre": "Acrobat.exe",
+                "ram_mb": 7.57
+            },
+            {
+                "pid": 4172,
+                "nombre": "svchost.exe",
+                "ram_mb": 8.65
+            },
+            {
+                "pid": 4316,
+                "nombre": "svchost.exe",
+                "ram_mb": 11.03
+            },
+            {
+                "pid": 4384,
+                "nombre": "chrome.exe",
+                "ram_mb": 0.99
+            },
+            {
+                "pid": 4392,
+                "nombre": "SecurityHealthService.exe",
+                "ram_mb": 1.47
+            },
+            {
+                "pid": 4432,
+                "nombre": "pservice.exe",
+                "ram_mb": 0.14
+            },
+            {
+                "pid": 4436,
+                "nombre": "ctfmon.exe",
+                "ram_mb": 9.88
+            },
+            {
+                "pid": 4444,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.61
+            },
+            {
+                "pid": 4488,
+                "nombre": "Code.exe",
+                "ram_mb": 115.21
+            },
+            {
+                "pid": 4500,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.14
+            },
+            {
+                "pid": 4508,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.01
+            },
+            {
+                "pid": 4524,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.46
+            },
+            {
+                "pid": 4712,
+                "nombre": "browserhost.exe",
+                "ram_mb": 2.83
+            },
+            {
+                "pid": 4824,
+                "nombre": "conhost.exe",
+                "ram_mb": 0.34
+            },
+            {
+                "pid": 4852,
+                "nombre": "svchost.exe",
+                "ram_mb": 5.63
+            },
+            {
+                "pid": 4956,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.12
+            },
+            {
+                "pid": 4996,
+                "nombre": "AdobeCollabSync.exe",
+                "ram_mb": 10.26
+            },
+            {
+                "pid": 5012,
+                "nombre": "audiodg.exe",
+                "ram_mb": 15.92
+            },
+            {
+                "pid": 5016,
+                "nombre": "svchost.exe",
+                "ram_mb": 12.77
+            },
+            {
+                "pid": 5024,
+                "nombre": "spoolsv.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 5132,
+                "nombre": "chrome.exe",
+                "ram_mb": 14.36
+            },
+            {
+                "pid": 5148,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.5
+            },
+            {
+                "pid": 5176,
+                "nombre": "armsvc.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 5216,
+                "nombre": "AnyDesk.exe",
+                "ram_mb": 0.57
+            },
+            {
+                "pid": 5236,
+                "nombre": "mDNSResponder.exe",
+                "ram_mb": 0.6
+            },
+            {
+                "pid": 5252,
+                "nombre": "unsecapp.exe",
+                "ram_mb": 2.03
+            },
+            {
+                "pid": 5272,
+                "nombre": "OfficeClickToRun.exe",
+                "ram_mb": 7.43
+            },
+            {
+                "pid": 5280,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.55
+            },
+            {
+                "pid": 5308,
+                "nombre": "CorsairGamingAudioCfgService64.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 5332,
+                "nombre": "svchost.exe",
+                "ram_mb": 11.43
+            },
+            {
+                "pid": 5364,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.45
+            },
+            {
+                "pid": 5372,
+                "nombre": "svchost.exe",
+                "ram_mb": 11.69
+            },
+            {
+                "pid": 5388,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.5
+            },
+            {
+                "pid": 5392,
+                "nombre": "conhost.exe",
+                "ram_mb": 0.33
+            },
+            {
+                "pid": 5408,
+                "nombre": "DSAService.exe",
+                "ram_mb": 12.41
+            },
+            {
+                "pid": 5436,
+                "nombre": "DSAUpdateService.exe",
+                "ram_mb": 1.27
+            },
+            {
+                "pid": 5468,
+                "nombre": "WmiPrvSE.exe",
+                "ram_mb": 1.26
+            },
+            {
+                "pid": 5488,
+                "nombre": "filezilla-server.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 5496,
+                "nombre": "esif_uf.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 5524,
+                "nombre": "ETDService.exe",
+                "ram_mb": 0.23
+            },
+            {
+                "pid": 5680,
+                "nombre": "Discord.exe",
+                "ram_mb": 552.66
+            },
+            {
+                "pid": 5688,
+                "nombre": "bash.exe",
+                "ram_mb": 6.01
+            },
+            {
+                "pid": 5692,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.12
+            },
+            {
+                "pid": 5720,
+                "nombre": "OneApp.IGCC.WinService.exe",
+                "ram_mb": 4.16
+            },
+            {
+                "pid": 5740,
+                "nombre": "PowerToys.Peek.UI.exe",
+                "ram_mb": 4.38
+            },
+            {
+                "pid": 5780,
+                "nombre": "chrome.exe",
+                "ram_mb": 6.96
+            },
+            {
+                "pid": 5800,
+                "nombre": "mc-fw-host.exe",
+                "ram_mb": 104.18
+            },
+            {
+                "pid": 5812,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 9.99
+            },
+            {
+                "pid": 5824,
+                "nombre": "servicehost.exe",
+                "ram_mb": 19.45
+            },
+            {
+                "pid": 5880,
+                "nombre": "chrome.exe",
+                "ram_mb": 103.41
+            },
+            {
+                "pid": 5896,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.54
+            },
+            {
+                "pid": 5928,
+                "nombre": "AgentService.exe",
+                "ram_mb": 0.71
+            },
+            {
+                "pid": 6032,
+                "nombre": "SchedulerService.exe",
+                "ram_mb": 0.58
+            },
+            {
+                "pid": 6148,
+                "nombre": "jhi_service.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 6160,
+                "nombre": "RtkAudUService64.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 6168,
+                "nombre": "RstMwService.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 6200,
+                "nombre": "ETDCtrl.exe",
+                "ram_mb": 0.52
+            },
+            {
+                "pid": 6256,
+                "nombre": "SECOMN64.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 6288,
+                "nombre": "Spotify.exe",
+                "ram_mb": 3.27
+            },
+            {
+                "pid": 6300,
+                "nombre": "RtkBtManServ.exe",
+                "ram_mb": 0.1
+            },
+            {
+                "pid": 6328,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.24
+            },
+            {
+                "pid": 6356,
+                "nombre": "svchost.exe",
+                "ram_mb": 10.38
+            },
+            {
+                "pid": 6396,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.59
+            },
+            {
+                "pid": 6480,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.86
+            },
+            {
+                "pid": 6584,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.56
+            },
+            {
+                "pid": 6612,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.03
+            },
+            {
+                "pid": 6704,
+                "nombre": "zerotier-one_x64.exe",
+                "ram_mb": 7.61
+            },
+            {
+                "pid": 6800,
+                "nombre": "TeamViewer_Service.exe",
+                "ram_mb": 2.98
+            },
+            {
+                "pid": 6824,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.71
+            },
+            {
+                "pid": 6844,
+                "nombre": "svchost.exe",
+                "ram_mb": 8.99
+            },
+            {
+                "pid": 6928,
+                "nombre": "ShellExperienceHost.exe",
+                "ram_mb": 39.95
+            },
+            {
+                "pid": 6936,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.54
+            },
+            {
+                "pid": 7156,
+                "nombre": "conhost.exe",
+                "ram_mb": 0.93
+            },
+            {
+                "pid": 7196,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.3
+            },
+            {
+                "pid": 7476,
+                "nombre": "Acrobat.exe",
+                "ram_mb": 0.71
+            },
+            {
+                "pid": 7572,
+                "nombre": "pwsh.exe",
+                "ram_mb": 55.73
+            },
+            {
+                "pid": 7640,
+                "nombre": "parsecd.exe",
+                "ram_mb": 17.93
+            },
+            {
+                "pid": 7676,
+                "nombre": "uihost.exe",
+                "ram_mb": 7.72
+            },
+            {
+                "pid": 7680,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.62
+            },
+            {
+                "pid": 8044,
+                "nombre": "Spotify.exe",
+                "ram_mb": 269.98
+            },
+            {
+                "pid": 8068,
+                "nombre": "RuntimeBroker.exe",
+                "ram_mb": 14.3
+            },
+            {
+                "pid": 8080,
+                "nombre": "mc-neo-host.exe",
+                "ram_mb": 8.28
+            },
+            {
+                "pid": 8244,
+                "nombre": "StartMenuExperienceHost.exe",
+                "ram_mb": 9.56
+            },
+            {
+                "pid": 8292,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.58
+            },
+            {
+                "pid": 8504,
+                "nombre": "crashpad_handler.exe",
+                "ram_mb": 0.07
+            },
+            {
+                "pid": 8612,
+                "nombre": "SearchHost.exe",
+                "ram_mb": 9.48
+            },
+            {
+                "pid": 8692,
+                "nombre": "SECOCL64.exe",
+                "ram_mb": 3.75
+            },
+            {
+                "pid": 8700,
+                "nombre": "conhost.exe",
+                "ram_mb": 0.16
+            },
+            {
+                "pid": 8816,
+                "nombre": "PowerToys.PowerLauncher.exe",
+                "ram_mb": 8.82
+            },
+            {
+                "pid": 8836,
+                "nombre": "mc-extn-browserhost.exe",
+                "ram_mb": 1.96
+            },
+            {
+                "pid": 9484,
+                "nombre": "chrome.exe",
+                "ram_mb": 6.14
+            },
+            {
+                "pid": 9556,
+                "nombre": "mc-fw-host.exe",
+                "ram_mb": 5.87
+            },
+            {
+                "pid": 9780,
+                "nombre": "NgcIso.exe",
+                "ram_mb": 0.0
+            },
+            {
+                "pid": 9800,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.59
+            },
+            {
+                "pid": 10104,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.9
+            },
+            {
+                "pid": 10216,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.91
+            },
+            {
+                "pid": 10372,
+                "nombre": "sihost.exe",
+                "ram_mb": 16.58
+            },
+            {
+                "pid": 10404,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.59
+            },
+            {
+                "pid": 10420,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.77
+            },
+            {
+                "pid": 10436,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 0.48
+            },
+            {
+                "pid": 10656,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.56
+            },
+            {
+                "pid": 10684,
+                "nombre": "chrome.exe",
+                "ram_mb": 13.05
+            },
+            {
+                "pid": 10736,
+                "nombre": "chrome.exe",
+                "ram_mb": 5.65
+            },
+            {
+                "pid": 10760,
+                "nombre": "svchost.exe",
+                "ram_mb": 19.25
+            },
+            {
+                "pid": 10768,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.85
+            },
+            {
+                "pid": 10780,
+                "nombre": "svchost.exe",
+                "ram_mb": 9.91
+            },
+            {
+                "pid": 10844,
+                "nombre": "Spotify.exe",
+                "ram_mb": 19.5
+            },
+            {
+                "pid": 10848,
+                "nombre": "taskhostw.exe",
+                "ram_mb": 4.63
+            },
+            {
+                "pid": 10940,
+                "nombre": "adb.exe",
+                "ram_mb": 1.95
+            },
+            {
+                "pid": 10956,
+                "nombre": "pwsh.exe",
+                "ram_mb": 20.72
+            },
+            {
+                "pid": 11052,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.3
+            },
+            {
+                "pid": 11068,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.49
+            },
+            {
+                "pid": 11072,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.51
+            },
+            {
+                "pid": 11112,
+                "nombre": "cmd.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 11140,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.2
+            },
+            {
+                "pid": 11180,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 6.84
+            },
+            {
+                "pid": 11232,
+                "nombre": "AggregatorHost.exe",
+                "ram_mb": 3.11
+            },
+            {
+                "pid": 11400,
+                "nombre": "XboxPcAppFT.exe",
+                "ram_mb": 5.0
+            },
+            {
+                "pid": 11440,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.58
+            },
+            {
+                "pid": 11504,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.97
+            },
+            {
+                "pid": 11516,
+                "nombre": "AppActions.exe",
+                "ram_mb": 5.21
+            },
+            {
+                "pid": 11596,
+                "nombre": "ApplicationFrameHost.exe",
+                "ram_mb": 3.46
+            },
+            {
+                "pid": 11600,
+                "nombre": "chrome.exe",
+                "ram_mb": 176.93
+            },
+            {
+                "pid": 11664,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.28
+            },
+            {
+                "pid": 11716,
+                "nombre": "explorer.exe",
+                "ram_mb": 110.36
+            },
+            {
+                "pid": 11728,
+                "nombre": "Code.exe",
+                "ram_mb": 51.91
+            },
+            {
+                "pid": 11888,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.25
+            },
+            {
+                "pid": 12016,
+                "nombre": "PhoneExperienceHost.exe",
+                "ram_mb": 8.16
+            },
+            {
+                "pid": 12024,
+                "nombre": "igfxEMN.exe",
+                "ram_mb": 0.29
+            },
+            {
+                "pid": 12108,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.64
+            },
+            {
+                "pid": 12156,
+                "nombre": "PowerToys.exe",
+                "ram_mb": 5.61
+            },
+            {
+                "pid": 12244,
+                "nombre": "chrome.exe",
+                "ram_mb": 49.82
+            },
+            {
+                "pid": 12304,
+                "nombre": "svchost.exe",
+                "ram_mb": 3.52
+            },
+            {
+                "pid": 12424,
+                "nombre": "svchost.exe",
+                "ram_mb": 8.52
+            },
+            {
+                "pid": 12540,
+                "nombre": "PowerToys.AlwaysOnTop.exe",
+                "ram_mb": 0.39
+            },
+            {
+                "pid": 12568,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.98
+            },
+            {
+                "pid": 12612,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.15
+            },
+            {
+                "pid": 12632,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.27
+            },
+            {
+                "pid": 12772,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.98
+            },
+            {
+                "pid": 12884,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 17.42
+            },
+            {
+                "pid": 12956,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 1.89
+            },
+            {
+                "pid": 12988,
+                "nombre": "svchost.exe",
+                "ram_mb": 5.54
+            },
+            {
+                "pid": 13004,
+                "nombre": "Discord.exe",
+                "ram_mb": 0.9
+            },
+            {
+                "pid": 13128,
+                "nombre": "cmd.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 13152,
+                "nombre": "PowerToys.AdvancedPaste.exe",
+                "ram_mb": 4.7
+            },
+            {
+                "pid": 13276,
+                "nombre": "PowerToys.Awake.exe",
+                "ram_mb": 4.3
+            },
+            {
+                "pid": 13420,
+                "nombre": "AdobeCollabSync.exe",
+                "ram_mb": 0.2
+            },
+            {
+                "pid": 13432,
+                "nombre": "SearchIndexer.exe",
+                "ram_mb": 7.69
+            },
+            {
+                "pid": 13468,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.05
+            },
+            {
+                "pid": 13572,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.87
+            },
+            {
+                "pid": 13600,
+                "nombre": "RtkAudUService64.exe",
+                "ram_mb": 0.33
+            },
+            {
+                "pid": 13640,
+                "nombre": "SystemSettings.exe",
+                "ram_mb": 0.01
+            },
+            {
+                "pid": 13856,
+                "nombre": "dllhost.exe",
+                "ram_mb": 0.39
+            },
+            {
+                "pid": 13980,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.27
+            },
+            {
+                "pid": 14144,
+                "nombre": "svchost.exe",
+                "ram_mb": 12.81
+            },
+            {
+                "pid": 14188,
+                "nombre": "Spotify.exe",
+                "ram_mb": 0.71
+            },
+            {
+                "pid": 14228,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 4.66
+            },
+            {
+                "pid": 14268,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.1
+            },
+            {
+                "pid": 14288,
+                "nombre": "BraveCrashHandler64.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 14368,
+                "nombre": "RuntimeBroker.exe",
+                "ram_mb": 8.2
+            },
+            {
+                "pid": 14436,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.43
+            },
+            {
+                "pid": 14444,
+                "nombre": "parsecd.exe",
+                "ram_mb": 47.24
+            },
+            {
+                "pid": 14632,
+                "nombre": "backgroundTaskHost.exe",
+                "ram_mb": 0.01
+            },
+            {
+                "pid": 14636,
+                "nombre": "WidgetBoard.exe",
+                "ram_mb": 7.67
+            },
+            {
+                "pid": 14652,
+                "nombre": "Spotify.exe",
+                "ram_mb": 10.63
+            },
+            {
+                "pid": 14660,
+                "nombre": "Spotify.exe",
+                "ram_mb": 67.88
+            },
+            {
+                "pid": 14728,
+                "nombre": "BraveCrashHandler.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 14756,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.44
+            },
+            {
+                "pid": 14784,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 7.66
+            },
+            {
+                "pid": 14808,
+                "nombre": "svchost.exe",
+                "ram_mb": 0.86
+            },
+            {
+                "pid": 15076,
+                "nombre": "WhatsApp.Root.exe",
+                "ram_mb": 48.41
+            },
+            {
+                "pid": 15108,
+                "nombre": "Code.exe",
+                "ram_mb": 33.84
+            },
+            {
+                "pid": 15116,
+                "nombre": "DSATray.exe",
+                "ram_mb": 10.19
+            },
+            {
+                "pid": 15172,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.32
+            },
+            {
+                "pid": 15324,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 4.16
+            },
+            {
+                "pid": 15420,
+                "nombre": "chrome.exe",
+                "ram_mb": 4.77
+            },
+            {
+                "pid": 15428,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.25
+            },
+            {
+                "pid": 15536,
+                "nombre": "WidgetService.exe",
+                "ram_mb": 7.52
+            },
+            {
+                "pid": 15584,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 3.16
+            },
+            {
+                "pid": 15668,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.37
+            },
+            {
+                "pid": 15732,
+                "nombre": "MicrosoftStartFeedProvider.exe",
+                "ram_mb": 30.32
+            },
+            {
+                "pid": 15844,
+                "nombre": "backgroundTaskHost.exe",
+                "ram_mb": 0.01
+            },
+            {
+                "pid": 16092,
+                "nombre": "Code.exe",
+                "ram_mb": 21.03
+            },
+            {
+                "pid": 16240,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.69
+            },
+            {
+                "pid": 16316,
+                "nombre": "TextInputHost.exe",
+                "ram_mb": 21.84
+            },
+            {
+                "pid": 16408,
+                "nombre": "AnyDesk.exe",
+                "ram_mb": 6.72
+            },
+            {
+                "pid": 16716,
+                "nombre": "IriunWebcam.exe",
+                "ram_mb": 43.97
+            },
+            {
+                "pid": 16732,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 40.13
+            },
+            {
+                "pid": 16736,
+                "nombre": "Discord.exe",
+                "ram_mb": 47.32
+            },
+            {
+                "pid": 16764,
+                "nombre": "svchost.exe",
+                "ram_mb": 4.76
+            },
+            {
+                "pid": 16912,
+                "nombre": "svchost.exe",
+                "ram_mb": 2.59
+            },
+            {
+                "pid": 16940,
+                "nombre": "chrome.exe",
+                "ram_mb": 40.57
+            },
+            {
+                "pid": 17208,
+                "nombre": "SecurityHealthSystray.exe",
+                "ram_mb": 0.3
+            },
+            {
+                "pid": 17536,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.5
+            },
+            {
+                "pid": 17932,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 5.29
+            },
+            {
+                "pid": 17952,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.46
+            },
+            {
+                "pid": 18148,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.07
+            },
+            {
+                "pid": 18264,
+                "nombre": "GameBarPresenceWriter.exe",
+                "ram_mb": 2.91
+            },
+            {
+                "pid": 18300,
+                "nombre": "Dolphin.exe",
+                "ram_mb": 6.19
+            },
+            {
+                "pid": 18320,
+                "nombre": "taskhostw.exe",
+                "ram_mb": 0.02
+            },
+            {
+                "pid": 18596,
+                "nombre": "chrome.exe",
+                "ram_mb": 342.8
+            },
+            {
+                "pid": 18612,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.69
+            },
+            {
+                "pid": 18636,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.45
+            },
+            {
+                "pid": 18696,
+                "nombre": "chrome.exe",
+                "ram_mb": 148.39
+            },
+            {
+                "pid": 18712,
+                "nombre": "chrome.exe",
+                "ram_mb": 4.41
+            },
+            {
+                "pid": 18784,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.71
+            },
+            {
+                "pid": 18804,
+                "nombre": "ShellHost.exe",
+                "ram_mb": 4.66
+            },
+            {
+                "pid": 18948,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 3.13
+            },
+            {
+                "pid": 19200,
+                "nombre": "RuntimeBroker.exe",
+                "ram_mb": 14.82
+            },
+            {
+                "pid": 19220,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.19
+            },
+            {
+                "pid": 19296,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 3.52
+            },
+            {
+                "pid": 19584,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.66
+            },
+            {
+                "pid": 19640,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.5
+            },
+            {
+                "pid": 19820,
+                "nombre": "Notepad.exe",
+                "ram_mb": 8.48
+            },
+            {
+                "pid": 19888,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 0.81
+            },
+            {
+                "pid": 19908,
+                "nombre": "Code.exe",
+                "ram_mb": 88.62
+            },
+            {
+                "pid": 19984,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.53
+            },
+            {
+                "pid": 20180,
+                "nombre": "xampp-control.exe",
+                "ram_mb": 3.05
+            },
+            {
+                "pid": 20424,
+                "nombre": "AcroCEF.exe",
+                "ram_mb": 1.32
+            },
+            {
+                "pid": 20436,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 2.44
+            },
+            {
+                "pid": 20732,
+                "nombre": "conhost.exe",
+                "ram_mb": 2.35
+            },
+            {
+                "pid": 20776,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.29
+            },
+            {
+                "pid": 20812,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.77
+            },
+            {
+                "pid": 20872,
+                "nombre": "svchost.exe",
+                "ram_mb": 1.41
+            },
+            {
+                "pid": 21144,
+                "nombre": "chrome.exe",
+                "ram_mb": 81.41
+            },
+            {
+                "pid": 21300,
+                "nombre": "Code.exe",
+                "ram_mb": 11.86
+            },
+            {
+                "pid": 21324,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.89
+            },
+            {
+                "pid": 21360,
+                "nombre": "FileCoAuth.exe",
+                "ram_mb": 0.32
+            },
+            {
+                "pid": 21424,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.17
+            },
+            {
+                "pid": 21460,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.32
+            },
+            {
+                "pid": 21664,
+                "nombre": "chrome.exe",
+                "ram_mb": 25.04
+            },
+            {
+                "pid": 21872,
+                "nombre": "WINWORD.EXE",
+                "ram_mb": 32.55
+            },
+            {
+                "pid": 21932,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.35
+            },
+            {
+                "pid": 21936,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.33
+            },
+            {
+                "pid": 22116,
+                "nombre": "WmiPrvSE.exe",
+                "ram_mb": 12.92
+            },
+            {
+                "pid": 22256,
+                "nombre": "ai.exe",
+                "ram_mb": 0.23
+            },
+            {
+                "pid": 22280,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.87
+            },
+            {
+                "pid": 22388,
+                "nombre": "chrome.exe",
+                "ram_mb": 3.58
+            },
+            {
+                "pid": 22476,
+                "nombre": "pet.exe",
+                "ram_mb": 3.06
+            },
+            {
+                "pid": 22748,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.31
+            },
+            {
+                "pid": 22800,
+                "nombre": "chrome.exe",
+                "ram_mb": 190.46
+            },
+            {
+                "pid": 22804,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.39
+            },
+            {
+                "pid": 22888,
+                "nombre": "Code.exe",
+                "ram_mb": 16.3
+            },
+            {
+                "pid": 23016,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.56
+            },
+            {
+                "pid": 23360,
+                "nombre": "conhost.exe",
+                "ram_mb": 1.24
+            },
+            {
+                "pid": 23520,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.53
+            },
+            {
+                "pid": 23576,
+                "nombre": "Code.exe",
+                "ram_mb": 1.92
+            },
+            {
+                "pid": 23876,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.24
+            },
+            {
+                "pid": 23976,
+                "nombre": "Code.exe",
+                "ram_mb": 275.73
+            },
+            {
+                "pid": 24024,
+                "nombre": "Code.exe",
+                "ram_mb": 20.53
+            },
+            {
+                "pid": 24236,
+                "nombre": "conhost.exe",
+                "ram_mb": 2.06
+            },
+            {
+                "pid": 24340,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.35
+            },
+            {
+                "pid": 24460,
+                "nombre": "bash.exe",
+                "ram_mb": 0.87
+            },
+            {
+                "pid": 24472,
+                "nombre": "chrome.exe",
+                "ram_mb": 2.25
+            },
+            {
+                "pid": 24480,
+                "nombre": "svchost.exe",
+                "ram_mb": 8.52
+            },
+            {
+                "pid": 24704,
+                "nombre": "python.exe",
+                "ram_mb": 3.86
+            },
+            {
+                "pid": 25000,
+                "nombre": "Code.exe",
+                "ram_mb": 198.12
+            },
+            {
+                "pid": 25016,
+                "nombre": "python.exe",
+                "ram_mb": 19.42
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-04 20:05:55",
+        "cpu_percent": 69.5,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.69,
+        "ram_percent": 86.9,
+        "procesos": [
+            {
+                "pid": 688,
+                "nombre": "chrome.exe",
+                "ram_mb": 173.65
+            },
+            {
+                "pid": 3576,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 437.36
+            },
+            {
+                "pid": 5680,
+                "nombre": "Discord.exe",
+                "ram_mb": 522.39
+            },
+            {
+                "pid": 5800,
+                "nombre": "mc-fw-host.exe",
+                "ram_mb": 119.27
+            },
+            {
+                "pid": 5880,
+                "nombre": "chrome.exe",
+                "ram_mb": 139.45
+            },
+            {
+                "pid": 8044,
+                "nombre": "Spotify.exe",
+                "ram_mb": 106.88
+            },
+            {
+                "pid": 11600,
+                "nombre": "chrome.exe",
+                "ram_mb": 196.43
+            },
+            {
+                "pid": 11716,
+                "nombre": "explorer.exe",
+                "ram_mb": 160.95
+            },
+            {
+                "pid": 15076,
+                "nombre": "WhatsApp.Root.exe",
+                "ram_mb": 106.65
+            },
+            {
+                "pid": 18596,
+                "nombre": "chrome.exe",
+                "ram_mb": 287.66
+            },
+            {
+                "pid": 18712,
+                "nombre": "chrome.exe",
+                "ram_mb": 308.49
+            },
+            {
+                "pid": 23976,
+                "nombre": "Code.exe",
+                "ram_mb": 265.19
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-04 20:06:42",
+        "cpu_percent": 65.4,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.86,
+        "ram_percent": 89.2,
+        "procesos": [
+            {
+                "pid": 3576,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 465.02
+            },
+            {
+                "pid": 5680,
+                "nombre": "Discord.exe",
+                "ram_mb": 534.72
+            },
+            {
+                "pid": 18712,
+                "nombre": "chrome.exe",
+                "ram_mb": 307.56
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-04 20:07:15",
+        "cpu_percent": 53.2,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.83,
+        "ram_percent": 88.7,
+        "procesos": []
     }
 ]
