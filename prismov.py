@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import psutil
 
+umbral_ram_MB= 100
 
 with open("perfil_base.json", "r") as archivo:
     datos = json.load(archivo)
@@ -36,7 +37,7 @@ snapshot = {
     "ram_total_gb": ram_total_gb,
     "ram_usada_gb": ram_usada_gb,
     "ram_percent": ram_percent,
-    "procesos": []
+    "procesos": procesos
 }
 
 datos.append(snapshot)
@@ -92,6 +93,21 @@ if ultima["ram_usada_gb"] > media_ram + 2 * desv_ram:
     print("⚠️ Pico de RAM detectado")
 
 procesos_habituales = set()
+
+procesos_habituales = set()
+
+for s in datos[:-1]:
+    for p in s["procesos"]:
+        procesos_habituales.add(p["nombre"])
+
+print("\n--- PROCESOS CON ALTO CONSUMO DE RAM ---")
+for p in procesos:
+    print(f"{p['pid']} - {p['nombre']} - {p['ram_mb']} MB")
+
+print("\n--- PROCESOS NUEVOS DETECTADOS ---")
+for p in procesos:
+    if p["nombre"] not in procesos_habituales:
+        print(f"Nuevo proceso: {p['nombre']} ({p['ram_mb']} MB)")
 
 for snapshot in datos:
     for proceso in snapshot["procesos"]:
