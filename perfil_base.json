@@ -1,0 +1,114 @@
+[
+    {
+        "fecha": "2026-01-15 14:30:00",
+        "cpu_percent": 12.5,
+        "ram_total_gb": 16,
+        "ram_usada_gb": 8.2,
+        "ram_percent": 51.25,
+        "procesos": [
+            {
+                "pid": 1234,
+                "nombre": "Chrome.exe",
+                "ram_mb": 350.4
+            },
+            {
+                "pid": 5678,
+                "nombre": "Discord.exe",
+                "ram_mb": 210.8
+            },
+            {
+                "pid": 9101,
+                "nombre": "Explorer.exe",
+                "ram_mb": 95.3
+            }
+        ]
+    },
+    {
+        "fecha": "2026-01-16 10:00:00",
+        "cpu_percent": 18.3,
+        "ram_total_gb": 16,
+        "ram_usada_gb": 9.1,
+        "ram_percent": 56.8,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 12:47:23",
+        "cpu_percent": 18.3,
+        "ram_total_gb": 16,
+        "ram_usada_gb": 9.1,
+        "ram_percent": 56.8,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 12:47:37",
+        "cpu_percent": 18.3,
+        "ram_total_gb": 16,
+        "ram_usada_gb": 9.1,
+        "ram_percent": 56.8,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 12:56:27",
+        "cpu_percent": 34.4,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.58,
+        "ram_percent": 85.6,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 13:10:59",
+        "cpu_percent": 49.2,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.35,
+        "ram_percent": 82.5,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 13:12:29",
+        "cpu_percent": 31.2,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.38,
+        "ram_percent": 83.0,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 13:13:20",
+        "cpu_percent": 27.0,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.32,
+        "ram_percent": 82.1,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 13:13:45",
+        "cpu_percent": 25.1,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.33,
+        "ram_percent": 82.2,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 13:42:04",
+        "cpu_percent": 59.8,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.14,
+        "ram_percent": 79.7,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-18 23:34:45",
+        "cpu_percent": 37.6,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.77,
+        "ram_percent": 87.9,
+        "procesos": []
+    },
+    {
+        "fecha": "2026-01-19 16:00:11",
+        "cpu_percent": 100.0,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 7.32,
+        "ram_percent": 95.2,
+        "procesos": []
+    }
+]
