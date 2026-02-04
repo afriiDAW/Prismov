@@ -12,8 +12,8 @@ IGNORAR = {
     "lsass.exe", "csrss.exe", "wininit.exe", "winlogon.exe"
 }
 
-UMBRAL_RAM_MB = 500
-MAX_SNAPSHOTS = 200
+UMBRAL_RAM_MB = 200          # Procesos que consumen más de X MB
+MAX_SNAPSHOTS = 200         # Máximo de snapshots guardados
 
 # Ruta relativa del JSON
 RUTA_JSON = os.path.join(os.path.dirname(__file__), "perfil_base.json")
@@ -59,6 +59,7 @@ for p in psutil.process_iter(['pid', 'name', 'memory_info']):
 
         ram_mb = round(p.info['memory_info'].rss / (1024**2), 2)
 
+        # Guardar solo procesos relevantes
         if ram_mb >= UMBRAL_RAM_MB:
             procesos_filtrados.append({
                 "pid": p.info['pid'],
@@ -94,29 +95,31 @@ print(f"Snapshot añadida correctamente: {fecha_actual}")
 # CÁLCULO DE MEDIA Y DESVIACIÓN
 # -------------------------------
 
-suma_cpu = sum(s["cpu_percent"] for s in datos)
-suma_ram = sum(s["ram_usada_gb"] for s in datos)
+if len(datos) > 1:  # Evitar división entre cero
 
-media_cpu = suma_cpu / len(datos)
-media_ram = suma_ram / len(datos)
+    suma_cpu = sum(s["cpu_percent"] for s in datos)
+    suma_ram = sum(s["ram_usada_gb"] for s in datos)
 
-var_cpu = sum((s["cpu_percent"] - media_cpu) ** 2 for s in datos) / len(datos)
-var_ram = sum((s["ram_usada_gb"] - media_ram) ** 2 for s in datos) / len(datos)
+    media_cpu = suma_cpu / len(datos)
+    media_ram = suma_ram / len(datos)
 
-desv_cpu = var_cpu ** 0.5
-desv_ram = var_ram ** 0.5
+    var_cpu = sum((s["cpu_percent"] - media_cpu) ** 2 for s in datos) / len(datos)
+    var_ram = sum((s["ram_usada_gb"] - media_ram) ** 2 for s in datos) / len(datos)
 
-# -------------------------------
-# DETECCIÓN DE ANOMALÍAS
-# -------------------------------
+    desv_cpu = var_cpu ** 0.5
+    desv_ram = var_ram ** 0.5
 
-ultima = datos[-1]
+    # -------------------------------
+    # DETECCIÓN DE ANOMALÍAS
+    # -------------------------------
 
-if ultima["cpu_percent"] > media_cpu + 2 * desv_cpu:
-    print("⚠️ Pico de CPU detectado")
+    ultima = datos[-1]
 
-if ultima["ram_usada_gb"] > media_ram + 2 * desv_ram:
-    print("⚠️ Pico de RAM detectado")
+    if ultima["cpu_percent"] > media_cpu + 2 * desv_cpu:
+        print("⚠️ Pico de CPU detectado")
+
+    if ultima["ram_usada_gb"] > media_ram + 2 * desv_ram:
+        print("⚠️ Pico de RAM detectado")
 
 # -------------------------------
 # DETECCIÓN DE NUEVOS PROCESOS
@@ -124,29 +127,10 @@ if ultima["ram_usada_gb"] > media_ram + 2 * desv_ram:
 
 procesos_habituales = set()
 
-for snapshot in datos:
+for snapshot in datos[:-1]:  # Excluir el último
     for proceso in snapshot["procesos"]:
         procesos_habituales.add(proceso["nombre"])
 
-for proceso in ultima["procesos"]:
+for proceso in datos[-1]["procesos"]:
     if proceso["nombre"] not in procesos_habituales:
         print(f"⚠️ Nuevo proceso detectado: {proceso['nombre']}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
