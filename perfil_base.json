@@ -166,5 +166,309 @@
                 "ram_mb": 491.64
             }
         ]
+    },
+    {
+        "fecha": "2026-02-05 00:15:10",
+        "cpu_percent": 52.9,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.53,
+        "ram_percent": 84.9,
+        "procesos": [
+            {
+                "pid": 3576,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 502.48
+            },
+            {
+                "pid": 4108,
+                "nombre": "Code.exe",
+                "ram_mb": 207.34
+            },
+            {
+                "pid": 5680,
+                "nombre": "Discord.exe",
+                "ram_mb": 623.34
+            },
+            {
+                "pid": 6528,
+                "nombre": "Code.exe",
+                "ram_mb": 347.59
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-05 00:15:47",
+        "cpu_percent": 51.1,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.61,
+        "ram_percent": 85.9,
+        "procesos": [
+            {
+                "pid": 3576,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 477.85
+            },
+            {
+                "pid": 4108,
+                "nombre": "Code.exe",
+                "ram_mb": 224.49
+            },
+            {
+                "pid": 5680,
+                "nombre": "Discord.exe",
+                "ram_mb": 624.04
+            },
+            {
+                "pid": 6528,
+                "nombre": "Code.exe",
+                "ram_mb": 348.38
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-11 18:10:55",
+        "cpu_percent": 100.0,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.34,
+        "ram_percent": 82.3,
+        "procesos": [
+            {
+                "pid": 1784,
+                "nombre": "Code.exe",
+                "ram_mb": 263.57
+            },
+            {
+                "pid": 3588,
+                "nombre": "MemCompression",
+                "ram_mb": 343.89
+            },
+            {
+                "pid": 6092,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 273.63
+            },
+            {
+                "pid": 10532,
+                "nombre": "Discord.exe",
+                "ram_mb": 311.11
+            },
+            {
+                "pid": 11744,
+                "nombre": "Code.exe",
+                "ram_mb": 349.09
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-11 18:16:02",
+        "cpu_percent": 74.2,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.61,
+        "ram_percent": 85.9,
+        "procesos": [
+            {
+                "pid": 1784,
+                "nombre": "Code.exe",
+                "ram_mb": 228.69
+            },
+            {
+                "pid": 3588,
+                "nombre": "MemCompression",
+                "ram_mb": 343.05
+            },
+            {
+                "pid": 6092,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 278.55
+            },
+            {
+                "pid": 10532,
+                "nombre": "Discord.exe",
+                "ram_mb": 317.68
+            },
+            {
+                "pid": 11744,
+                "nombre": "Code.exe",
+                "ram_mb": 350.19
+            },
+            {
+                "pid": 20456,
+                "nombre": "Code.exe",
+                "ram_mb": 449.19
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-11 18:46:09",
+        "cpu_percent": 56.4,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.8,
+        "ram_percent": 88.4,
+        "procesos": [
+            {
+                "pid": 664,
+                "nombre": "chrome.exe",
+                "ram_mb": 132.16
+            },
+            {
+                "pid": 1784,
+                "nombre": "Code.exe",
+                "ram_mb": 100.07
+            },
+            {
+                "pid": 3588,
+                "nombre": "MemCompression",
+                "ram_mb": 138.09
+            },
+            {
+                "pid": 4972,
+                "nombre": "Code.exe",
+                "ram_mb": 105.54
+            },
+            {
+                "pid": 6092,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 279.97
+            },
+            {
+                "pid": 6120,
+                "nombre": "mc-fw-host.exe",
+                "ram_mb": 138.16
+            },
+            {
+                "pid": 10532,
+                "nombre": "Discord.exe",
+                "ram_mb": 248.76
+            },
+            {
+                "pid": 10620,
+                "nombre": "chrome.exe",
+                "ram_mb": 173.28
+            },
+            {
+                "pid": 11028,
+                "nombre": "chrome.exe",
+                "ram_mb": 796.24
+            },
+            {
+                "pid": 11380,
+                "nombre": "explorer.exe",
+                "ram_mb": 139.9
+            },
+            {
+                "pid": 11744,
+                "nombre": "Code.exe",
+                "ram_mb": 305.93
+            },
+            {
+                "pid": 15732,
+                "nombre": "chrome.exe",
+                "ram_mb": 118.28
+            },
+            {
+                "pid": 17732,
+                "nombre": "chrome.exe",
+                "ram_mb": 133.98
+            },
+            {
+                "pid": 20456,
+                "nombre": "Code.exe",
+                "ram_mb": 323.98
+            },
+            {
+                "pid": 21356,
+                "nombre": "Code.exe",
+                "ram_mb": 108.0
+            },
+            {
+                "pid": 21568,
+                "nombre": "chrome.exe",
+                "ram_mb": 321.36
+            }
+        ]
+    },
+    {
+        "fecha": "2026-02-11 18:52:25",
+        "cpu_percent": 49.2,
+        "ram_total_gb": 7.7,
+        "ram_usada_gb": 6.67,
+        "ram_percent": 86.7,
+        "procesos": [
+            {
+                "pid": 664,
+                "nombre": "chrome.exe",
+                "ram_mb": 134.66
+            },
+            {
+                "pid": 1784,
+                "nombre": "Code.exe",
+                "ram_mb": 132.63
+            },
+            {
+                "pid": 4972,
+                "nombre": "Code.exe",
+                "ram_mb": 107.59
+            },
+            {
+                "pid": 6092,
+                "nombre": "msedgewebview2.exe",
+                "ram_mb": 280.91
+            },
+            {
+                "pid": 6120,
+                "nombre": "mc-fw-host.exe",
+                "ram_mb": 128.33
+            },
+            {
+                "pid": 10532,
+                "nombre": "Discord.exe",
+                "ram_mb": 248.75
+            },
+            {
+                "pid": 10620,
+                "nombre": "chrome.exe",
+                "ram_mb": 165.98
+            },
+            {
+                "pid": 11028,
+                "nombre": "chrome.exe",
+                "ram_mb": 752.2
+            },
+            {
+                "pid": 11380,
+                "nombre": "explorer.exe",
+                "ram_mb": 135.44
+            },
+            {
+                "pid": 11744,
+                "nombre": "Code.exe",
+                "ram_mb": 300.51
+            },
+            {
+                "pid": 15732,
+                "nombre": "chrome.exe",
+                "ram_mb": 116.56
+            },
+            {
+                "pid": 17732,
+                "nombre": "chrome.exe",
+                "ram_mb": 147.15
+            },
+            {
+                "pid": 20456,
+                "nombre": "Code.exe",
+                "ram_mb": 352.83
+            },
+            {
+                "pid": 21356,
+                "nombre": "Code.exe",
+                "ram_mb": 122.47
+            },
+            {
+                "pid": 21568,
+                "nombre": "chrome.exe",
+                "ram_mb": 320.67
+            }
+        ]
     }
 ]
