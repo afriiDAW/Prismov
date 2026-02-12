@@ -4,6 +4,9 @@ import json
 import os
 import datetime
 import requests
+import random
+import string
+import webbrowser
 
 # ============================================================
 # RUTAS FIJAS PARA QUE FUNCIONE EN .EXE
@@ -70,6 +73,37 @@ def guardar_programacion(nueva_prog):
     config["programacion"] = nueva_prog
     guardar_config(config)
 
+# ============================================================
+# CÓDIGO DE VINCULACIÓN DE USUARIOS
+# ============================================================
+
+def generar_codigo_vinculacion():
+    """Genera un código aleatorio de 6 caracteres para vincular usuarios"""
+    caracteres = string.ascii_uppercase + string.digits
+    codigo = ''.join(random.choices(caracteres, k=6))
+    return codigo
+
+def cargar_codigo_vinculacion():
+    """Carga el código de vinculación actual"""
+    config = cargar_config()
+    codigo = config.get("codigo_vinculacion")
+    
+    # Si no hay código, generar uno nuevo
+    if not codigo:
+        codigo = generar_codigo_vinculacion()
+        config["codigo_vinculacion"] = codigo
+        guardar_config(config)
+    
+    return codigo
+
+def generar_nuevo_codigo():
+    """Genera un nuevo código de vinculación"""
+    codigo = generar_codigo_vinculacion()
+    config = cargar_config()
+    config["codigo_vinculacion"] = codigo
+    guardar_config(config)
+    return codigo
+
 def configurar_programacion_consola():
     print("\n=== CONFIGURAR PROGRAMACIÓN ===")
 
@@ -99,7 +133,7 @@ def configurar_programacion_consola():
 # TELEGRAM
 # ============================================================
 
-TELEGRAM_TOKEN = "8488886057:AAH8PkpvspCgwGWNY4ImAKgJ7bf58fzpzjo"
+TELEGRAM_TOKEN = ""
 
 def cargar_chat_id():
     return cargar_config().get("chat_id")
@@ -109,7 +143,38 @@ def guardar_chat_id(chat_id):
     config["chat_id"] = chat_id
     guardar_config(config)
 
+def telegram_configurado():
+    """Verifica si Telegram está configurado"""
+    return cargar_chat_id() is not None
+
+def obtener_chat_id_y_validar_codigo():
+    """
+    Obtiene el chat_id pero verificando que el último mensaje contenga el código de vinculación correcto
+    Retorna: (chat_id, código_valido) o (None, False)
+    """
+    codigo_esperado = cargar_codigo_vinculacion()
+    
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
+        r = requests.get(url).json()
+        
+        if "result" in r and len(r["result"]) > 0:
+            ultimo_mensaje = r["result"][-1].get("message", {})
+            texto_mensaje = ultimo_mensaje.get("text", "").upper()
+            chat_id = ultimo_mensaje.get("chat", {}).get("id")
+            
+            # Verificar si el mensaje contiene el código
+            if codigo_esperado in texto_mensaje:
+                return chat_id, True
+            else:
+                return None, False
+        
+        return None, False
+    except:
+        return None, False
+
 def obtener_chat_id():
+    """Obtiene solo el chat_id del último mensaje"""
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
         r = requests.get(url).json()
@@ -138,92 +203,524 @@ def analizar_procesos():
     procesos = []
     for p in psutil.process_iter(["pid", "name", "cpu_percent", "memory_info"]):
         try:
+            info = p.info
             procesos.append({
-                "pid": p.info["pid"],
-                "nombre": p.info["name"],
-                "cpu": p.info["cpu_percent"],
-                "ram_mb": p.info["memory_info"].rss / (1024 * 1024)
+                "pid": info["pid"],
+                "nombre": info["name"],
+                "cpu": round(info["cpu_percent"], 2),
+                "ram_mb": round(info["memory_info"].rss / (1024 * 1024), 2)
             })
         except:
             pass
-    return procesos
+    return sorted(procesos, key=lambda x: x["ram_mb"], reverse=True)
+
+def analizar_tendencias(historial):
+    """Analiza tendencias en el historial"""
+    if len(historial) < 2:
+        return "Datos insuficientes", "Datos insuficientes", []
+    
+    # Comparar últimos dos registros
+    ultimo = historial[-1]
+    anterior = historial[-2]
+    
+    cpu_actual = ultimo["cpu_percent"]
+    cpu_anterior = anterior["cpu_percent"]
+    ram_actual = ultimo["ram_percent"]
+    ram_anterior = anterior["ram_percent"]
+    
+    # Determinar tendencia de CPU
+    if cpu_actual > cpu_anterior + 10:
+        tendencia_cpu = "↑ Creciente"
+    elif cpu_actual < cpu_anterior - 10:
+        tendencia_cpu = "↓ Decreciente"
+    else:
+        tendencia_cpu = "→ Estable"
+    
+    # Determinar tendencia de RAM
+    if ram_actual > ram_anterior + 5:
+        tendencia_ram = "↑ Creciente"
+    elif ram_actual < ram_anterior - 5:
+        tendencia_ram = "↓ Decreciente"
+    else:
+        tendencia_ram = "→ Estable"
+    
+    # Detectar procesos con consumo creciente
+    procesos_crecientes = []
+    procesos_actuales = {p["nombre"]: p for p in ultimo["procesos"]}
+    procesos_anteriores = {p["nombre"]: p for p in anterior["procesos"]}
+    
+    for nombre, proc_actual in procesos_actuales.items():
+        if nombre in procesos_anteriores:
+            proc_anterior = procesos_anteriores[nombre]
+            if proc_actual["ram_mb"] > proc_anterior["ram_mb"] + 50:  # Más de 50MB de aumento
+                procesos_crecientes.append({
+                    "nombre": nombre,
+                    "ram_anterior": proc_anterior["ram_mb"],
+                    "ram_actual": proc_actual["ram_mb"]
+                })
+    
+    return tendencia_cpu, tendencia_ram, procesos_crecientes
+
+def detectar_procesos_sospechosos(procesos):
+    """Detecta procesos que consumen recursos anormales"""
+    sospechosos = []
+    
+    # Obtener estadísticas
+    if not procesos:
+        return sospechosos
+    
+    # Procesos procesados
+    procesos_con_recursos = [p for p in procesos if p["ram_mb"] > 0 or p["cpu"] > 0]
+    
+    if not procesos_con_recursos:
+        return sospechosos
+    
+    ram_values = [p["ram_mb"] for p in procesos_con_recursos]
+    ram_promedio = sum(ram_values) / len(ram_values)
+    ram_desv = (sum((x - ram_promedio) ** 2 for x in ram_values) / len(ram_values)) ** 0.5
+    
+    cpu_values = [p["cpu"] for p in procesos_con_recursos if p["cpu"] > 0]
+    cpu_promedio = sum(cpu_values) / len(cpu_values) if cpu_values else 0
+    
+    # Procesos que consumen >30% del RAM promedio o >5% CPU
+    for proc in procesos_con_recursos:
+        razon_ram = proc["ram_mb"] / ram_promedio if ram_promedio > 0 else 0
+        
+        if (proc["ram_mb"] > 500 and razon_ram > 2) or proc["cpu"] > 10:
+            sospechosos.append({
+                "nombre": proc["nombre"],
+                "ram_mb": proc["ram_mb"],
+                "cpu": proc["cpu"],
+                "razon": f"Alto consumo de {'RAM' if proc['ram_mb'] > 500 else 'CPU'}"
+            })
+    
+    return sorted(sospechosos, key=lambda x: x["ram_mb"], reverse=True)
 
 def analisis_avanzado(snapshot, historial):
+    """Análisis avanzado y preciso del sistema"""
+    tendencia_cpu, tendencia_ram, procesos_crecientes = analizar_tendencias(historial)
+    sospechosos = detectar_procesos_sospechosos(snapshot["procesos"])
+    
+    # Procesos frecuentes (top 5 por RAM)
+    procesos_frecuentes = [p["nombre"] for p in snapshot["procesos"][:5]]
+    
+    # Calcular promedios históricos
+    if len(historial) > 1:
+        cpu_promedio = sum(s["cpu_percent"] for s in historial[-10:]) / min(10, len(historial))
+        ram_promedio = sum(s["ram_percent"] for s in historial[-10:]) / min(10, len(historial))
+    else:
+        cpu_promedio = snapshot["cpu_percent"]
+        ram_promedio = snapshot["ram_percent"]
+    
+    # Determinar riesgo
+    riesgo = "BAJO"
+    if len(sospechosos) > 3:
+        riesgo = "ALTO"
+    elif len(sospechosos) > 0:
+        riesgo = "MEDIO"
+    elif snapshot["cpu_percent"] > 80 or snapshot["ram_percent"] > 85:
+        riesgo = "MEDIO"
+    
+    # Recomendaciones
+    recomendaciones = []
+    if snapshot["cpu_percent"] > 80:
+        recomendaciones.append("CPU muy alta. Considera cerrar aplicaciones innecesarias.")
+    if snapshot["ram_percent"] > 85:
+        recomendaciones.append("RAM muy alta. Reinicia el sistema si es posible.")
+    if len(sospechosos) > 0:
+        recomendaciones.append(f"Detectados {len(sospechosos)} proceso(s) con alto consumo de recursos.")
+    if not recomendaciones:
+        recomendaciones.append("El sistema funciona correctamente.")
+    
     return {
         "tendencias": {
-            "cpu": "estable",
-            "ram": "estable",
-            "procesos_crecientes": []
+            "cpu": tendencia_cpu,
+            "ram": tendencia_ram,
+            "procesos_crecientes": procesos_crecientes
         },
-        "sospechosos_persistentes": [],
+        "sospechosos_persistentes": sospechosos,
         "huella_del_sistema": {
-            "cpu_promedio": snapshot["cpu_percent"],
-            "ram_promedio": snapshot["ram_percent"],
-            "procesos_frecuentes": [],
-            "procesos_pesados_constantes": []
+            "cpu_promedio": round(cpu_promedio, 2),
+            "ram_promedio": round(ram_promedio, 2),
+            "procesos_frecuentes": procesos_frecuentes,
+            "procesos_pesados_constantes": [p["nombre"] for p in snapshot["procesos"][:3]]
         },
-        "procesos_nuevos": [],
+        "procesos_nuevos": [p["nombre"] for p in snapshot["procesos"][:3]],
         "score_detallado": {
-            "riesgo_sistema": "BAJO"
+            "riesgo_sistema": riesgo
         },
-        "recomendaciones": [
-            "Todo parece estable."
-        ]
+        "recomendaciones": recomendaciones
     }
 
 # ============================================================
-# GENERAR INFORME
+# GENERAR REPORTES HTML
 # ============================================================
 
-def formatear_sospechosos(lista):
-    if not lista:
-        return "Ninguno"
-    texto = ""
-    for s in lista:
-        texto += f"- *{s['nombre']}* (RAM media: {s['ram_media_mb']} MB, Instancias: {s['instancias_medias']}, Frecuencia: {s['frecuencia']})\n"
-    return texto
+REPORTES_DIR = os.path.join(DATA_DIR, "reportes")
+os.makedirs(REPORTES_DIR, exist_ok=True)
 
-def generar_informe_completo(snapshot):
+def generar_reporte_html(snapshot):
+    """Genera un reporte HTML detallado y atractivo"""
     a = snapshot["analisis_avanzado"]
+    timestamp = snapshot["timestamp"]
+    
+    # Determinar color según riesgo
+    riesgo = a["score_detallado"]["riesgo_sistema"]
+    if riesgo == "BAJO":
+        color_riesgo = "#4CAF50"  # Verde
+        bg_riesgo = "#E8F5E9"
+    elif riesgo == "MEDIO":
+        color_riesgo = "#FF9800"  # Naranja
+        bg_riesgo = "#FFF3E0"
+    else:
+        color_riesgo = "#F44336"  # Rojo
+        bg_riesgo = "#FFEBEE"
+    
+    # Procesos sospechosos HTML
+    procesos_html = ""
+    if a["sospechosos_persistentes"]:
+        for proc in a["sospechosos_persistentes"]:
+            procesos_html += f"""
+            <tr>
+                <td>{proc['nombre']}</td>
+                <td>{proc['ram_mb']:.2f} MB</td>
+                <td>{proc['cpu']:.2f}%</td>
+                <td>{proc['razon']}</td>
+            </tr>
+            """
+    else:
+        procesos_html = "<tr><td colspan='4' style='text-align:center; color:#999;'>✓ Ninguno detectado</td></tr>"
+    
+    # Procesos crecientes HTML
+    procesos_crec_html = ""
+    if a["tendencias"]["procesos_crecientes"]:
+        for proc in a["tendencias"]["procesos_crecientes"]:
+            procesos_crec_html += f"""
+            <tr>
+                <td>{proc['nombre']}</td>
+                <td>{proc['ram_anterior']:.2f} MB</td>
+                <td>{proc['ram_actual']:.2f} MB</td>
+                <td>↑ +{proc['ram_actual'] - proc['ram_anterior']:.2f} MB</td>
+            </tr>
+            """
+    else:
+        procesos_crec_html = "<tr><td colspan='4' style='text-align:center; color:#999;'>✓ Ninguno detectado</td></tr>"
+    
+    # Procesos frecuentes
+    procesos_freq_html = ""
+    if a["huella_del_sistema"]["procesos_frecuentes"]:
+        for proc in a["huella_del_sistema"]["procesos_frecuentes"]:
+            procesos_freq_html += f"<li>{proc}</li>"
+    
+    # Recomendaciones
+    recomendaciones_html = ""
+    for rec in a["recomendaciones"]:
+        recomendaciones_html += f"<li>{rec}</li>"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PRISMOV - Informe del Sistema</title>
+        <style>
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 20px;
+                min-height: 100vh;
+            }}
+            .container {{
+                max-width: 1000px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                overflow: hidden;
+            }}
+            .header {{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }}
+            .header h1 {{
+                font-size: 32px;
+                margin-bottom: 10px;
+            }}
+            .header p {{
+                font-size: 14px;
+                opacity: 0.9;
+            }}
+            .content {{
+                padding: 30px;
+            }}
+            .section {{
+                margin-bottom: 30px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 20px;
+            }}
+            .section:last-child {{
+                border-bottom: none;
+            }}
+            .section h2 {{
+                color: #667eea;
+                font-size: 20px;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }}
+            .stats {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-bottom: 20px;
+            }}
+            .stat-card {{
+                background: #f5f5f5;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+            }}
+            .stat-card .label {{
+                color: #666;
+                font-size: 12px;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+            }}
+            .stat-card .value {{
+                font-size: 28px;
+                font-weight: bold;
+                color: #667eea;
+            }}
+            .stat-card .unit {{
+                font-size: 14px;
+                color: #999;
+            }}
+            .risk-box {{
+                background: {bg_riesgo};
+                border-left: 5px solid {color_riesgo};
+                padding: 20px;
+                border-radius: 5px;
+                margin: 15px 0;
+            }}
+            .risk-box .risk-label {{
+                font-size: 12px;
+                color: #666;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }}
+            .risk-box .risk-value {{
+                font-size: 24px;
+                font-weight: bold;
+                color: {color_riesgo};
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+            }}
+            table th {{
+                background: #f5f5f5;
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                color: #333;
+                border-bottom: 2px solid #ddd;
+            }}
+            table td {{
+                padding: 12px;
+                border-bottom: 1px solid #eee;
+            }}
+            table tr:hover {{
+                background: #f9f9f9;
+            }}
+            .trend-good {{
+                color: #4CAF50;
+                font-weight: bold;
+            }}
+            .trend-warning {{
+                color: #FF9800;
+                font-weight: bold;
+            }}
+            .trend-danger {{
+                color: #F44336;
+                font-weight: bold;
+            }}
+            ul {{
+                margin-left: 20px;
+                margin-top: 10px;
+            }}
+            ul li {{
+                margin-bottom: 8px;
+                color: #333;
+            }}
+            .footer {{
+                background: #f5f5f5;
+                padding: 20px;
+                text-align: center;
+                color: #999;
+                font-size: 12px;
+                border-top: 1px solid #eee;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📊 PRISMOV</h1>
+                <p>Informe de Análisis del Sistema</p>
+                <p>{timestamp}</p>
+            </div>
+            
+            <div class="content">
+                <!-- RESUMEN RÁPIDO -->
+                <div class="section">
+                    <h2>⚡ Resumen Rápido</h2>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="label">Uso de CPU</div>
+                            <div class="value">{snapshot['cpu_percent']:.1f}<span class="unit">%</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Uso de RAM</div>
+                            <div class="value">{snapshot['ram_percent']:.1f}<span class="unit">%</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Procesos Activos</div>
+                            <div class="value">{len(snapshot['procesos'])}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Riesgo del Sistema</div>
+                            <div class="value" style="color: {color_riesgo};">{riesgo}</div>
+                        </div>
+                    </div>
+                </div>
 
-    informe = f"""
-📊 *PRISMOV - Informe del Sistema*
-Fecha: {snapshot["timestamp"]}
+                <!-- EVALUACIÓN DE RIESGO -->
+                <div class="section">
+                    <h2>⚠️ Evaluación de Riesgo</h2>
+                    <div class="risk-box">
+                        <div class="risk-label">Nivel de Riesgo del Sistema</div>
+                        <div class="risk-value">{riesgo}</div>
+                    </div>
+                </div>
 
-🖥 *Rendimiento*
-• CPU: {snapshot["cpu_percent"]}%
-• RAM: {snapshot["ram_percent"]}%
+                <!-- TENDENCIAS -->
+                <div class="section">
+                    <h2>📈 Tendencias</h2>
+                    <table>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Tendencia</th>
+                            <th>Promedio (últimas 10 muestras)</th>
+                        </tr>
+                        <tr>
+                            <td>CPU</td>
+                            <td><span class="trend-good">{a['tendencias']['cpu']}</span></td>
+                            <td>{a['huella_del_sistema']['cpu_promedio']:.2f}%</td>
+                        </tr>
+                        <tr>
+                            <td>RAM</td>
+                            <td><span class="trend-good">{a['tendencias']['ram']}</span></td>
+                            <td>{a['huella_del_sistema']['ram_promedio']:.2f}%</td>
+                        </tr>
+                    </table>
+                </div>
 
-📈 *Tendencias*
-• CPU: {a["tendencias"]["cpu"]}
-• RAM: {a["tendencias"]["ram"]}
-• Procesos con consumo creciente: {", ".join(a["tendencias"]["procesos_crecientes"]) or "Ninguno"}
+                <!-- PROCESOS SOSPECHOSOS -->
+                <div class="section">
+                    <h2>🕵️ Procesos con Alto Consumo</h2>
+                    <table>
+                        <tr>
+                            <th>Nombre del Proceso</th>
+                            <th>Memoria (MB)</th>
+                            <th>CPU (%)</th>
+                            <th>Razón</th>
+                        </tr>
+                        {procesos_html}
+                    </table>
+                </div>
 
-🕵️ *Sospechosos Persistentes*
-{formatear_sospechosos(a["sospechosos_persistentes"])}
+                <!-- PROCESOS CON AUMENTO DE RECURSOS -->
+                <div class="section">
+                    <h2>📊 Procesos con Aumento de Recursos</h2>
+                    <table>
+                        <tr>
+                            <th>Proceso</th>
+                            <th>RAM Anterior (MB)</th>
+                            <th>RAM Actual (MB)</th>
+                            <th>Cambio</th>
+                        </tr>
+                        {procesos_crec_html}
+                    </table>
+                </div>
 
-🧬 *Huella del Sistema*
-• CPU promedio: {a["huella_del_sistema"]["cpu_promedio"]}%
-• RAM promedio: {a["huella_del_sistema"]["ram_promedio"]}%
-• Procesos frecuentes: {", ".join(a["huella_del_sistema"]["procesos_frecuentes"]) or "Ninguno"}
-• Pesados constantes: {", ".join(a["huella_del_sistema"]["procesos_pesados_constantes"]) or "Ninguno"}
+                <!-- PROCESOS PRINCIPALES -->
+                <div class="section">
+                    <h2>🔝 Procesos Principales</h2>
+                    <ul>
+                        {procesos_freq_html if procesos_freq_html else "<li>No hay procesos principales detectados</li>"}
+                    </ul>
+                </div>
 
-🆕 *Procesos Nuevos*
-{", ".join(a["procesos_nuevos"]) or "Ninguno"}
+                <!-- RECOMENDACIONES -->
+                <div class="section">
+                    <h2>💡 Recomendaciones</h2>
+                    <ul>
+                        {recomendaciones_html}
+                    </ul>
+                </div>
+            </div>
 
-⚠️ *Riesgo del Sistema:* *{a["score_detallado"]["riesgo_sistema"]}*
+            <div class="footer">
+                <p>PRISMOV © 2026 - Sistema de Monitorización Avanzado del Sistema</p>
+                <p>Reporte generado automáticamente</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
 
-🛠 *Recomendaciones*
-- """ + "\n- ".join(a["recomendaciones"])
+def guardar_reporte(snapshot):
+    """Guarda el reporte en HTML"""
+    html = generar_reporte_html(snapshot)
+    
+    # Nombre del archivo con timestamp
+    timestamp = snapshot["timestamp"].replace(":", "-").replace(" ", "_")
+    filename = f"reporte_{timestamp}.html"
+    filepath = os.path.join(REPORTES_DIR, filename)
+    
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(html)
+    
+    return filepath
 
-    return informe
+def abrir_reporte(filepath):
+    """Abre el reporte en el navegador por defecto"""
+    try:
+        webbrowser.open(f"file:///{filepath.replace(chr(92), '/')}")
+        return True
+    except:
+        return False
 
 # ============================================================
 # EJECUTAR ANÁLISIS
 # ============================================================
 
 def ejecutar_analisis(historial):
-    cpu = psutil.cpu_percent()
+    """Ejecuta un análisis completo y genera reporte"""
+    
+    cpu = psutil.cpu_percent(interval=1)
     ram = psutil.virtual_memory().percent
     procesos = analizar_procesos()
 
@@ -234,7 +731,7 @@ def ejecutar_analisis(historial):
         "procesos": procesos
     }
 
-    # Ahora sí, análisis avanzado con datos reales
+    # Análisis avanzado con datos reales
     analisis = analisis_avanzado(snapshot_base, historial)
 
     snapshot = {
@@ -248,8 +745,32 @@ def ejecutar_analisis(historial):
     historial.append(snapshot)
     guardar_historial(historial)
 
-    informe = generar_informe_completo(snapshot)
-    enviar_telegram(informe)
+    # Guardar reporte HTML
+    filepath_reporte = guardar_reporte(snapshot)
+
+    # Enviar a Telegram si está configurado
+    if telegram_configurado():
+        # Crear mensaje resumido para Telegram
+        a = snapshot["analisis_avanzado"]
+        mensaje = f"""
+📊 *PRISMOV - Informe Rápido*
+📅 {snapshot["timestamp"]}
+
+🖥 *Recursos*
+• CPU: {snapshot["cpu_percent"]:.1f}%
+• RAM: {snapshot["ram_percent"]:.1f}%
+
+📈 *Tendencias*
+• CPU: {a["tendencias"]["cpu"]}
+• RAM: {a["tendencias"]["ram"]}
+
+⚠️ *Riesgo: {a["score_detallado"]["riesgo_sistema"]}*
+
+💾 Reporte completo guardado localmente.
+        """
+        enviar_telegram(mensaje)
+    
+    return filepath_reporte
 
 
 # ============================================================
