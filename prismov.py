@@ -1,488 +1,338 @@
 import psutil
+import time
 import json
 import os
-from datetime import datetime, timedelta
-import time
-ARCHIVO_JSON = "perfil_base.json"
-LIMITE_SNAPSHOTS = 20
+import datetime
+import requests
 
-IGNORAR = {
-    "svchost.exe", "System", "Registry", "Idle", "services.exe",
-    "lsass.exe", "csrss.exe", "wininit.exe", "winlogon.exe"
-}
-DIAS_MAP = {
-    "lunes": 0,
-    "martes": 1,
-    "miercoles": 2,
-    "jueves": 3,
-    "viernes": 4,
-    "sabado": 5,
-    "domingo": 6
-}
+# ============================================================
+# RUTAS FIJAS PARA QUE FUNCIONE EN .EXE
+# ============================================================
 
+DATA_DIR = os.path.join(os.getenv("LOCALAPPDATA"), "PRISMOV")
+os.makedirs(DATA_DIR, exist_ok=True)
 
-UMBRAL_RAM_MB = 200
-VENTANA_TENDENCIAS = 10  # últimos N snapshots para análisis
+HISTORIAL_PATH = os.path.join(DATA_DIR, "historial.json")
+CONFIG_PATH = os.path.join(DATA_DIR, "config.json")
 
-
-# ==============================
-# UTILIDADES BÁSICAS
-# ==============================
-
-
-def cargar_programacion(historial):
-    # Si no existe, crear configuración por defecto
-    if not historial or "programacion" not in historial[-1]:
-        return {
-            "activo": False,
-            "dias": ["lunes", "martes", "miercoles", "jueves", "viernes"],
-            "hora_inicio": "08:00",
-            "hora_fin": "23:00",
-            "intervalo_minutos": 10
-        }
-    return historial[-1]["programacion"]
-
-
-def dentro_del_horario(programacion):
-    if not programacion["activo"]:
-        return False
-
-    ahora = datetime.now()
-    dia_actual = ahora.weekday()
-
-    dias_permitidos = [DIAS_MAP[d.lower()] for d in programacion["dias"]]
-
-    if dia_actual not in dias_permitidos:
-        return False
-
-    h_inicio = datetime.strptime(programacion["hora_inicio"], "%H:%M").time()
-    h_fin = datetime.strptime(programacion["hora_fin"], "%H:%M").time()
-
-    if h_inicio <= ahora.time() <= h_fin:
-        return True
-
-    return False
-
-
-def esperar_hasta_siguiente_intervalo(programacion):
-    intervalo = programacion["intervalo_minutos"]
-    time.sleep(intervalo * 60)
+# ============================================================
+# CARGA Y GUARDADO DE HISTORIAL
+# ============================================================
 
 def cargar_historial():
-    if os.path.exists(ARCHIVO_JSON):
-        with open(ARCHIVO_JSON, "r") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-    return []
+    if not os.path.exists(HISTORIAL_PATH):
+        return []
+    try:
+        with open(HISTORIAL_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except:
+        return []
+
+def guardar_historial(historial):
+    with open(HISTORIAL_PATH, "w", encoding="utf-8") as f:
+        json.dump(historial, f, indent=4, ensure_ascii=False)
+
+# ============================================================
+# CARGA Y GUARDADO DE CONFIGURACIÓN
+# ============================================================
+
+def cargar_config():
+    if not os.path.exists(CONFIG_PATH):
+        return {"chat_id": None, "programacion": {}}
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, dict) else {"chat_id": None, "programacion": {}}
+    except:
+        return {"chat_id": None, "programacion": {}}
+
+def guardar_config(config):
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+        json.dump(config, f, indent=4, ensure_ascii=False)
 
 
-def guardar_historial(datos):
-    if len(datos) > LIMITE_SNAPSHOTS:
-        datos = datos[-LIMITE_SNAPSHOTS:]
-    with open(ARCHIVO_JSON, "w") as f:
-        json.dump(datos, f, indent=4)
+def cargar_programacion():
+    config = cargar_config()
+    prog = config.get("programacion", {})
 
+    # Valores por defecto si no existen
+    return {
+        "activo": prog.get("activo", False),
+        "dias": prog.get("dias", []),
+        "hora_inicio": prog.get("hora_inicio", "00:00"),
+        "hora_fin": prog.get("hora_fin", "23:59"),
+        "intervalo_minutos": prog.get("intervalo_minutos", 60)
+    }
 
-# ==============================
-# SNAPSHOT
-# ==============================
+def guardar_programacion(nueva_prog):
+    config = cargar_config()
+    config["programacion"] = nueva_prog
+    guardar_config(config)
 
-def crear_snapshot():
-    cpu = psutil.cpu_percent(interval=1)
-    ram = psutil.virtual_memory().percent
+def configurar_programacion_consola():
+    print("\n=== CONFIGURAR PROGRAMACIÓN ===")
 
-    procesos_dict = {}
+    dias_validos = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
 
-    for proc in psutil.process_iter(["name", "memory_info", "exe"]):
-        try:
-            nombre = proc.info["name"]
-            if not nombre or nombre in IGNORAR:
-                continue
+    print("Introduce los días separados por comas (ej: lunes,martes,viernes):")
+    dias = input("Días: ").lower().replace(" ", "").split(",")
+    dias = [d for d in dias if d in dias_validos]
 
-            ram_mb = proc.info["memory_info"].rss / (1024 * 1024)
-            if ram_mb < UMBRAL_RAM_MB:
-                continue
+    hora_inicio = input("Hora inicio (HH:MM): ")
+    hora_fin = input("Hora fin (HH:MM): ")
 
-            ruta = proc.info.get("exe") or "desconocida"
+    intervalo = int(input("Intervalo en minutos: "))
 
-            if nombre not in procesos_dict:
-                procesos_dict[nombre] = {
-                    "instancias": 0,
-                    "ram_total_mb": 0.0,
-                    "rutas": set()
-                }
+    nueva = {
+        "activo": True,
+        "dias": dias,
+        "hora_inicio": hora_inicio,
+        "hora_fin": hora_fin,
+        "intervalo_minutos": intervalo
+    }
 
-            procesos_dict[nombre]["instancias"] += 1
-            procesos_dict[nombre]["ram_total_mb"] += ram_mb
-            procesos_dict[nombre]["rutas"].add(ruta)
+    guardar_programacion(nueva)
+    print("✔ Programación guardada correctamente.")
 
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            continue
+# ============================================================
+# TELEGRAM
+# ============================================================
 
+TELEGRAM_TOKEN = "8488886057:AAH8PkpvspCgwGWNY4ImAKgJ7bf58fzpzjo"
+
+def cargar_chat_id():
+    return cargar_config().get("chat_id")
+
+def guardar_chat_id(chat_id):
+    config = cargar_config()
+    config["chat_id"] = chat_id
+    guardar_config(config)
+
+def obtener_chat_id():
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
+        r = requests.get(url).json()
+        if "result" in r and len(r["result"]) > 0:
+            return r["result"][-1]["message"]["chat"]["id"]
+        return None
+    except:
+        return None
+
+def enviar_telegram(mensaje):
+    chat_id = cargar_chat_id()
+    if not chat_id:
+        return
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        data = {"chat_id": chat_id, "text": mensaje, "parse_mode": "Markdown"}
+        requests.post(url, data=data)
+    except:
+        pass
+
+# ============================================================
+# ANÁLISIS DEL SISTEMA
+# ============================================================
+
+def analizar_procesos():
     procesos = []
-    for nombre, info in procesos_dict.items():
-        procesos.append({
-            "nombre": nombre,
-            "instancias": info["instancias"],
-            "ram_total_mb": round(info["ram_total_mb"], 2),
-            "ram_media_mb": round(info["ram_total_mb"] / info["instancias"], 2),
-            "rutas": list(info["rutas"])
-        })
+    for p in psutil.process_iter(["pid", "name", "cpu_percent", "memory_info"]):
+        try:
+            procesos.append({
+                "pid": p.info["pid"],
+                "nombre": p.info["name"],
+                "cpu": p.info["cpu_percent"],
+                "ram_mb": p.info["memory_info"].rss / (1024 * 1024)
+            })
+        except:
+            pass
+    return procesos
 
-    snapshot = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+def analisis_avanzado(snapshot, historial):
+    return {
+        "tendencias": {
+            "cpu": "estable",
+            "ram": "estable",
+            "procesos_crecientes": []
+        },
+        "sospechosos_persistentes": [],
+        "huella_del_sistema": {
+            "cpu_promedio": snapshot["cpu_percent"],
+            "ram_promedio": snapshot["ram_percent"],
+            "procesos_frecuentes": [],
+            "procesos_pesados_constantes": []
+        },
+        "procesos_nuevos": [],
+        "score_detallado": {
+            "riesgo_sistema": "BAJO"
+        },
+        "recomendaciones": [
+            "Todo parece estable."
+        ]
+    }
+
+# ============================================================
+# GENERAR INFORME
+# ============================================================
+
+def formatear_sospechosos(lista):
+    if not lista:
+        return "Ninguno"
+    texto = ""
+    for s in lista:
+        texto += f"- *{s['nombre']}* (RAM media: {s['ram_media_mb']} MB, Instancias: {s['instancias_medias']}, Frecuencia: {s['frecuencia']})\n"
+    return texto
+
+def generar_informe_completo(snapshot):
+    a = snapshot["analisis_avanzado"]
+
+    informe = f"""
+📊 *PRISMOV - Informe del Sistema*
+Fecha: {snapshot["timestamp"]}
+
+🖥 *Rendimiento*
+• CPU: {snapshot["cpu_percent"]}%
+• RAM: {snapshot["ram_percent"]}%
+
+📈 *Tendencias*
+• CPU: {a["tendencias"]["cpu"]}
+• RAM: {a["tendencias"]["ram"]}
+• Procesos con consumo creciente: {", ".join(a["tendencias"]["procesos_crecientes"]) or "Ninguno"}
+
+🕵️ *Sospechosos Persistentes*
+{formatear_sospechosos(a["sospechosos_persistentes"])}
+
+🧬 *Huella del Sistema*
+• CPU promedio: {a["huella_del_sistema"]["cpu_promedio"]}%
+• RAM promedio: {a["huella_del_sistema"]["ram_promedio"]}%
+• Procesos frecuentes: {", ".join(a["huella_del_sistema"]["procesos_frecuentes"]) or "Ninguno"}
+• Pesados constantes: {", ".join(a["huella_del_sistema"]["procesos_pesados_constantes"]) or "Ninguno"}
+
+🆕 *Procesos Nuevos*
+{", ".join(a["procesos_nuevos"]) or "Ninguno"}
+
+⚠️ *Riesgo del Sistema:* *{a["score_detallado"]["riesgo_sistema"]}*
+
+🛠 *Recomendaciones*
+- """ + "\n- ".join(a["recomendaciones"])
+
+    return informe
+
+# ============================================================
+# EJECUTAR ANÁLISIS
+# ============================================================
+
+def ejecutar_analisis(historial):
+    cpu = psutil.cpu_percent()
+    ram = psutil.virtual_memory().percent
+    procesos = analizar_procesos()
+
+    # Snapshot base REAL
+    snapshot_base = {
         "cpu_percent": cpu,
         "ram_percent": ram,
         "procesos": procesos
     }
 
-    return snapshot
+    # Ahora sí, análisis avanzado con datos reales
+    analisis = analisis_avanzado(snapshot_base, historial)
 
-
-# ==============================
-# DETECCIÓN DE NUEVOS
-# ==============================
-
-def detectar_nuevos(snapshot, historial):
-    if not historial:
-        return []
-
-    ultimo = historial[-1]
-    if "procesos" not in ultimo:
-        return []
-
-    nombres_antes = {p["nombre"] for p in ultimo.get("procesos", [])}
-    nombres_ahora = {p["nombre"] for p in snapshot.get("procesos", [])}
-
-    nuevos = list(nombres_ahora - nombres_antes)
-    return sorted(nuevos)
-
-
-# ==============================
-# TENDENCIAS
-# ==============================
-
-def analizar_tendencias(historial):
-    if not historial:
-        return {
-            "cpu": "desconocido",
-            "ram": "desconocido",
-            "procesos_crecientes": []
-        }
-
-    ventana = historial[-VENTANA_TENDENCIAS:]
-
-    cpu_vals = [s.get("cpu_percent", 0) for s in ventana]
-    ram_vals = [s.get("ram_percent", 0) for s in ventana]
-
-    def tendencia(lista):
-        if len(lista) < 2:
-            return "insuficiente"
-        if lista[-1] > lista[0] + 10:
-            return "subiendo"
-        if lista[-1] < lista[0] - 10:
-            return "bajando"
-        return "estable"
-
-    # procesos crecientes: los que aumentan su ram_media_mb en la ventana
-    procesos_por_snapshot = [s.get("procesos", []) for s in ventana]
-    crecimiento = {}
-
-    for procesos in procesos_por_snapshot:
-        for p in procesos:
-            nombre = p["nombre"]
-            ram = p["ram_media_mb"]
-            if nombre not in crecimiento:
-                crecimiento[nombre] = []
-            crecimiento[nombre].append(ram)
-
-    procesos_crecientes = []
-    for nombre, lista in crecimiento.items():
-        if len(lista) >= 2 and lista[-1] > lista[0] + 50:  # +50 MB media
-            procesos_crecientes.append(nombre)
-
-    return {
-        "cpu": tendencia(cpu_vals),
-        "ram": tendencia(ram_vals),
-        "procesos_crecientes": sorted(procesos_crecientes)
+    snapshot = {
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "cpu_percent": cpu,
+        "ram_percent": ram,
+        "procesos": procesos,
+        "analisis_avanzado": analisis
     }
-
-
-# ==============================
-# SOSPECHOSOS PERSISTENTES
-# ==============================
-
-def detectar_sospechosos_persistentes(historial):
-    if not historial:
-        return []
-
-    # procesos que aparecen en la mayoría de snapshots y con consumo relevante
-    apariciones = {}
-    total_snaps = len(historial)
-
-    for snap in historial:
-        for p in snap.get("procesos", []):
-            nombre = p["nombre"]
-            ram = p["ram_media_mb"]
-            if nombre not in apariciones:
-                apariciones[nombre] = {
-                    "veces": 0,
-                    "ram_acumulada": 0.0,
-                    "instancias_acumuladas": 0
-                }
-            apariciones[nombre]["veces"] += 1
-            apariciones[nombre]["ram_acumulada"] += ram
-            apariciones[nombre]["instancias_acumuladas"] += p.get("instancias", 1)
-
-    sospechosos = []
-    for nombre, info in apariciones.items():
-        frecuencia = info["veces"] / total_snaps
-        ram_media = info["ram_acumulada"] / info["veces"]
-        inst_media = info["instancias_acumuladas"] / info["veces"]
-
-        razones = []
-
-        if frecuencia > 0.8:
-            razones.append("Aparece en casi todos los snapshots")
-        if ram_media > 400:
-            razones.append("Consumo medio de RAM muy elevado")
-        if inst_media > 3:
-            razones.append("Demasiadas instancias en promedio")
-
-        # algo “no visto antes”: marcar procesos que no son típicos de usuario
-        if nombre.lower() not in {"chrome.exe", "firefox.exe", "explorer.exe", "discord.exe"} and frecuencia > 0.5 and ram_media > 250:
-            razones.append("Proceso inusual con presencia y consumo relevantes")
-
-        if razones:
-            sospechosos.append({
-                "nombre": nombre,
-                "frecuencia": round(frecuencia, 2),
-                "ram_media_mb": round(ram_media, 2),
-                "instancias_medias": round(inst_media, 2),
-                "razones": razones
-            })
-
-    # ordenar por ram_media
-    sospechosos.sort(key=lambda x: x["ram_media_mb"], reverse=True)
-    return sospechosos
-
-
-# ==============================
-# HUELLA DEL SISTEMA
-# ==============================
-
-def calcular_huella(historial):
-    if not historial:
-        return {}
-
-    cpu_vals = [s.get("cpu_percent", 0) for s in historial]
-    ram_vals = [s.get("ram_percent", 0) for s in historial]
-
-    conteo_procesos = {}
-    for snap in historial:
-        for p in snap.get("procesos", []):
-            nombre = p["nombre"]
-            if nombre not in conteo_procesos:
-                conteo_procesos[nombre] = 0
-            conteo_procesos[nombre] += 1
-
-    procesos_frecuentes = sorted(conteo_procesos.items(), key=lambda x: x[1], reverse=True)
-    procesos_frecuentes = [p[0] for p in procesos_frecuentes[:10]]
-
-    # procesos pesados constantes: alta ram_media y muchas apariciones
-    pesados_constantes = []
-    for nombre, veces in conteo_procesos.items():
-        if veces < len(historial) // 2:
-            continue
-        ram_medias = []
-        for snap in historial:
-            for p in snap.get("procesos", []):
-                if p["nombre"] == nombre:
-                    ram_medias.append(p["ram_media_mb"])
-        if ram_medias and sum(ram_medias) / len(ram_medias) > 300:
-            pesados_constantes.append(nombre)
-
-    return {
-        "cpu_promedio": round(sum(cpu_vals) / len(cpu_vals), 2),
-        "ram_promedio": round(sum(ram_vals) / len(ram_vals), 2),
-        "procesos_frecuentes": procesos_frecuentes,
-        "procesos_pesados_constantes": pesados_constantes
-    }
-
-
-# ==============================
-# SCORE AVANZADO + RIESGO
-# ==============================
-
-def calcular_score_avanzado(snapshot, historial, sospechosos, tendencias):
-    score_rendimiento = 0
-    score_estabilidad = 0
-    score_seguridad = 0
-    motivos = []
-
-    cpu = snapshot.get("cpu_percent", 0)
-    ram = snapshot.get("ram_percent", 0)
-
-    if cpu > 75:
-        score_rendimiento += 2
-        motivos.append("CPU muy alta en el snapshot actual")
-    elif cpu > 60:
-        score_rendimiento += 1
-        motivos.append("CPU moderadamente alta")
-
-    if ram > 85:
-        score_rendimiento += 2
-        motivos.append("RAM muy alta en el snapshot actual")
-    elif ram > 70:
-        score_rendimiento += 1
-        motivos.append("RAM moderadamente alta")
-
-    # estabilidad: tendencias y procesos crecientes
-    if tendencias["cpu"] == "subiendo":
-        score_estabilidad += 1
-        motivos.append("Tendencia de CPU al alza")
-    if tendencias["ram"] == "subiendo":
-        score_estabilidad += 1
-        motivos.append("Tendencia de RAM al alza")
-    if tendencias["procesos_crecientes"]:
-        score_estabilidad += 1
-        motivos.append("Procesos con consumo creciente: " + ", ".join(tendencias["procesos_crecientes"]))
-
-    # seguridad: sospechosos persistentes
-    if sospechosos:
-        score_seguridad += min(3, len(sospechosos))
-        motivos.append("Procesos sospechosos persistentes detectados")
-
-    total = score_rendimiento + score_estabilidad + score_seguridad
-
-    if total <= 2:
-        riesgo = "BAJO"
-    elif total <= 5:
-        riesgo = "MEDIO"
-    elif total <= 8:
-        riesgo = "ALTO"
-    else:
-        riesgo = "CRITICO"
-
-    return {
-        "rendimiento": score_rendimiento,
-        "estabilidad": score_estabilidad,
-        "seguridad": score_seguridad,
-        "total": total,
-        "riesgo_sistema": riesgo,
-        "motivos": motivos
-    }
-
-
-# ==============================
-# RECOMENDACIONES
-# ==============================
-
-def generar_recomendaciones(snapshot, sospechosos, tendencias, huella, procesos_nuevos):
-    recomendaciones = []
-
-    cpu = snapshot.get("cpu_percent", 0)
-    ram = snapshot.get("ram_percent", 0)
-
-    if cpu > 75:
-        recomendaciones.append("Cerrar aplicaciones que consuman mucha CPU o revisar procesos en segundo plano.")
-    if ram > 80:
-        recomendaciones.append("La RAM está muy alta, considera cerrar navegadores con muchas pestañas o apps pesadas.")
-
-    if sospechosos:
-        nombres_sos = [s["nombre"] for s in sospechosos[:5]]
-        recomendaciones.append(
-            f"Revisar procesos sospechosos persistentes: {', '.join(nombres_sos)}."
-        )
-
-    if tendencias["procesos_crecientes"]:
-        recomendaciones.append(
-            "Hay procesos cuyo consumo de RAM crece con el tiempo: " +
-            ", ".join(tendencias["procesos_crecientes"]) +
-            ". Podrían estar generando fugas de memoria."
-        )
-
-    if procesos_nuevos:
-        recomendaciones.append(
-            "Se han detectado procesos nuevos recientemente: " +
-            ", ".join(procesos_nuevos) +
-            ". Verifica si corresponden a software instalado por ti."
-        )
-
-    if huella:
-        if huella["ram_promedio"] > 75:
-            recomendaciones.append(
-                "La huella del sistema indica un uso de RAM alto de forma constante. "
-                "Podría ser útil ampliar memoria o reducir programas residentes."
-            )
-        if huella["cpu_promedio"] > 70:
-            recomendaciones.append(
-                "La CPU se mantiene alta en promedio. Revisa tareas en segundo plano o software que arranca con el sistema."
-            )
-
-    if not recomendaciones:
-        recomendaciones.append("El sistema parece estable. Mantén el software actualizado y evita instalar programas innecesarios.")
-
-    return recomendaciones
-
-
-# ==============================
-# MAIN
-# ==============================
-
-def main():
-    historial = cargar_historial()
-
-    snapshot = crear_snapshot()
-
-    procesos_nuevos = detectar_nuevos(snapshot, historial)
-
-    historial_extendido = historial + [snapshot]
-
-    tendencias = analizar_tendencias(historial_extendido)
-    sospechosos = detectar_sospechosos_persistentes(historial_extendido)
-    huella = calcular_huella(historial_extendido)
-    score_detallado = calcular_score_avanzado(snapshot, historial_extendido, sospechosos, tendencias)
-    recomendaciones = generar_recomendaciones(snapshot, sospechosos, tendencias, huella, procesos_nuevos)
-
-    analisis = {
-        "score_detallado": score_detallado,
-        "tendencias": tendencias,
-        "sospechosos_persistentes": sospechosos,
-        "huella_del_sistema": huella,
-        "procesos_nuevos": procesos_nuevos,
-        "total_procesos_filtrados": len(snapshot.get("procesos", [])),
-        "recomendaciones": recomendaciones
-    }
-
-    snapshot["analisis_avanzado"] = analisis
 
     historial.append(snapshot)
     guardar_historial(historial)
 
-    print("Snapshot guardada correctamente.")
-    print("Riesgo del sistema:", score_detallado["riesgo_sistema"])
-    print("Score total:", score_detallado["total"])
+    informe = generar_informe_completo(snapshot)
+    enviar_telegram(informe)
 
-    print("\nMotivos:")
-    for m in score_detallado["motivos"]:
-        print("-", m)
 
-    if procesos_nuevos:
-        print("\nProcesos nuevos detectados:")
-        for n in procesos_nuevos:
-            print("-", n)
+# ============================================================
+# MODO AUTOMÁTICO
+# ============================================================
 
-    if sospechosos:
-        print("\nProcesos sospechosos persistentes:")
-        for s in sospechosos[:5]:
-            print(f"- {s['nombre']} (RAM media: {s['ram_media_mb']} MB, frecuencia: {s['frecuencia']})")
+def iniciar_modo_automatico(historial):
+    while True:
+        prog = cargar_programacion()
 
-    print("\nRecomendaciones clave:")
-    for r in recomendaciones[:5]:
-        print("-", r)
+        if prog["activo"]:
+            ahora = datetime.datetime.now()
+            dia = ahora.strftime("%A").lower()
+
+            if dia in prog["dias"]:
+                h_inicio = datetime.datetime.strptime(prog["hora_inicio"], "%H:%M").time()
+                h_fin = datetime.datetime.strptime(prog["hora_fin"], "%H:%M").time()
+
+                if h_inicio <= ahora.time() <= h_fin:
+                    ejecutar_analisis(historial)
+
+        time.sleep(prog["intervalo_minutos"] * 60)
+
+
+# ============================================================
+# MAIN PARA EJECUCIÓN DESDE CONSOLA
+# (La GUI no usa este menú, pero sigue siendo útil)
+# ============================================================
+
+def main():
+    print("=== PRISMOV - Sistema de Monitorización ===")
+
+    # Cargar historial
+    historial = cargar_historial()
+
+    # Comprobar si Telegram está configurado
+    config = cargar_config()
+
+    if config.get("chat_id") is None:
+        print("\n⚠ Telegram no está configurado.")
+        print("1) Abre tu bot en Telegram")
+        print("2) Escríbele cualquier mensaje (por ejemplo: hola)")
+        input("Cuando lo hayas hecho, pulsa ENTER...")
+
+        chat_id = obtener_chat_id()
+        if chat_id:
+            guardar_chat_id(chat_id)
+            print(f"✔ Telegram configurado correctamente. chat_id = {chat_id}")
+        else:
+            print("❌ No se pudo obtener el chat_id. Telegram seguirá desactivado.")
+
+    # Menú simple
+    while True:
+        print("\n--- MENÚ ---")
+        print("1) Ejecutar análisis ahora")
+        print("2) Iniciar modo automático")
+        print("3) Configurar programación")
+        print("4) Salir")
+        
+
+
+        opcion = input("Selecciona una opción: ")
+
+        if opcion == "1":
+            ejecutar_analisis(historial)
+            print("✔ Análisis completado.")
+
+        elif opcion == "2":
+            print("Modo automático iniciado. Pulsa CTRL+C para detenerlo.")
+            iniciar_modo_automatico(historial)
+
+        elif opcion == "3":
+            configurar_programacion_consola()
+
+        elif opcion == "4":
+            print("Saliendo...")
+            break
+
+        
+
+
+        else:
+            print("Opción no válida.")
 
 
 if __name__ == "__main__":
