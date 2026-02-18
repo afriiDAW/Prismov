@@ -133,7 +133,7 @@ def configurar_programacion_consola():
 # TELEGRAM
 # ============================================================
 
-TELEGRAM_TOKEN = ""
+TELEGRAM_TOKEN = "#####"
 
 def cargar_chat_id():
     return cargar_config().get("chat_id")
@@ -146,6 +146,13 @@ def guardar_chat_id(chat_id):
 def telegram_configurado():
     """Verifica si Telegram está configurado"""
     return cargar_chat_id() is not None
+
+
+def borrar_chat_id():
+    """Elimina el chat_id almacenado (cierra sesión de Telegram)"""
+    config = cargar_config()
+    config["chat_id"] = None
+    guardar_config(config)
 
 def obtener_chat_id_y_validar_codigo():
     """
