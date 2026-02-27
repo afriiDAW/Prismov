@@ -864,29 +864,11 @@ import webbrowser
 from tkinter import messagebox, simpledialog, Tk, Listbox, Button, SINGLE
 
 def abrir_reportes_nube():
-    username_data = cargar_config().get("username")
-    username = username_data[0] if isinstance(username_data, list) else username_data
-    if not username: return
-    try:
-        response = supabase.storage.from_('prismov-reportes').list(f'reportes/{username}')
-        root = Tk()
-        root.title(f"Logs de {username}")
-        lista = Listbox(root, width=60, height=15, selectmode=SINGLE)
-        lista.pack(padx=20, pady=20)
-        
-        for item in response:
-            if item['name'] != '.emptyFolderPlaceholder': lista.insert('end', item['name'])
-        
-        def ver_en_browser():
-            if lista.curselection():
-                archivo = lista.get(lista.curselection()[0])
-                # Usamos la URL pública de Supabase
-                url = f"{SUPABASE_URL}/storage/v1/object/public/prismov-reportes/reportes/{username}/{archivo}"
-                webbrowser.open(url)
-
-        Button(root, text="Visualizar en Navegador", command=ver_en_browser, bg="#764ba2", fg="white").pack(pady=10)
-        root.mainloop()
-    except Exception as e: print(f"Error al listar: {e}")
+    import webbrowser
+    
+    url = "https://supabase.com/dashboard/project/ejtmmwqhetlhwihxejdu/storage/buckets/prismov-reportes"
+    
+    webbrowser.open(url)
 
 def generar_vista_previa_html(contenido_log, nombre_archivo):
     html_template = f"""
