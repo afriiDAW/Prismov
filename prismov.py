@@ -7,18 +7,47 @@ import requests
 import random
 import string
 import webbrowser
+from supabase import create_client
+import io
+from weasyprint import HTML
 
 
 # ============================================================
 # SUPABASE
 # ============================================================
 
-SUPABASE_URL = ""
-SUPABASE_API_KEY = ""  # Usa la service_role, NO la anon
+SUPABASE_URL = "https://ejtmmwqhetlhwihxejdu.supabase.co"
+SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqdG1td3FoZXRsaHdpaHhlamR1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTQzMjEyMCwiZXhwIjoyMDg3MDA4MTIwfQ.gK6H0XdiPe9UbL_4VedDjbSmRhoft22Z7gE-uY6hP_M"  # Usa la service_role, NO la anon
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqdG1td3FoZXRsaHdpaHhlamR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzIxMjAsImV4cCI6MjA4NzAwODEyMH0.nX6mfYsecLuKaNCIm4PMbe94Ygmc1CTgzNxV6MipiK8"
+supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
+
+usuario_actual = None
+
+def guardar_reporte_pdf(snapshot):
+    html = generar_reporte_html(snapshot)
+
+    username = cargar_config().get("username")
+
+    REPORTES_DIR = os.path.join(DATA_DIR, "reportes")
+    os.makedirs(REPORTES_DIR, exist_ok=True)
+
+    timestamp = snapshot["timestamp"].replace(":", "-").replace(" ", "_")
+
+    filename = f"reporte_{timestamp}.pdf"
+    filepath = os.path.join(REPORTES_DIR, filename)
+
+    HTML(string=html).write_pdf(filepath)
+
+    return filepath
 
 def supabase_configurado():
+    global usuario_actual
     config = cargar_config()
-    return config.get("supabase_activo", False)
+
+    return (
+        usuario_actual is not None and
+        config.get("supabase_activo", False)
+    )
 
 def activar_supabase():
     config = cargar_config()
@@ -30,34 +59,99 @@ def desactivar_supabase():
     config["supabase_activo"] = False
     guardar_config(config)
 
-def subir_reporte_supabase(snapshot):
-    """
-    Sube el snapshot completo a Supabase
-    Requiere tabla llamada: reportes
-    """
+
+def subir_snapshot_a_storage(snapshot):
+    global usuario_actual
+
+    if not usuario_actual:
+        print("⚠ No hay usuario logueado.")
+        return False
+
     try:
-        headers = {
-            "apikey": SUPABASE_API_KEY,
-            "Authorization": f"Bearer {SUPABASE_API_KEY}",
-            "Content-Type": "application/json"
-        }
+        import datetime
 
-        data = {
-            "timestamp": snapshot["timestamp"],
-            "cpu_percent": snapshot["cpu_percent"],
-            "ram_percent": snapshot["ram_percent"],
-            "riesgo": snapshot["analisis_avanzado"]["score_detallado"]["riesgo_sistema"],
-            "snapshot_completo": snapshot
-        }
+        ts = snapshot.get("timestamp") or datetime.datetime.now().isoformat()
+        safe_ts = ts.replace(":", "-").replace(" ", "_")
 
-        url = f"{SUPABASE_URL}/rest/v1/reportes"
-        r = requests.post(url, headers=headers, json=data)
+        filename = f"{usuario_actual.id}_{safe_ts}.json"
 
-        return r.status_code in [200, 201]
+        # JSON → bytes
+        file_bytes = json.dumps(snapshot, ensure_ascii=False, indent=2).encode("utf-8")
+
+        # Upload simple (sin file_options)
+        username = cargar_config().get("username")
+
+        user_folder = f"reportes/{username}"
+
+        resp = supabase.storage.from_("prismov-reportes").upload(
+        path=f"{user_folder}/{filename}",
+        file=file_bytes
+        
+        )
+        print("✅ Subido a Storage:", resp)
+        return True
 
     except Exception as e:
-        print("Error subiendo a Supabase:", e)
+        print("❌ ERROR SUBIENDO A STORAGE:", repr(e))
         return False
+
+def abrir_directorio_supabase():
+    username = cargar_config().get("username")
+
+    url = supabase.storage.from_("prismov-reportes").get_public_url(
+        f"reportes/{username}/"
+    )
+
+    webbrowser.open(url)
+    
+def registrar_usuario():
+    global usuario_actual
+
+    email = input("Email: ")
+    password = input("Password: ")
+
+    response = supabase.auth.sign_up({
+        "email": email,
+        "password": password
+    })
+
+    if response.user:
+        print("✔ Usuario registrado.")
+    else:
+        print("❌ Error al registrar.")
+
+
+def login_usuario():
+    global usuario_actual
+
+    email = input("Email: ")
+    password = input("Password: ")
+
+    response = supabase.auth.sign_in_with_password({
+        "email": email,
+        "password": password
+    })
+
+    if response.user:
+        usuario_actual = response.user
+
+        # ⭐ Crear username simple desde email
+        username = email.split("@")[0]
+
+        # ⭐ Guardar en config.json
+        config = cargar_config()
+        config["username"] = username
+        config["supabase_activo"] = True
+        guardar_config(config)
+
+        print("✔ Login correcto.")
+    else:
+        print("❌ Credenciales incorrectas.")
+
+
+
+
+
 
 # ============================================================
 # RUTAS FIJAS PARA QUE FUNCIONE EN .EXE
@@ -92,14 +186,33 @@ def guardar_historial(historial):
 # ============================================================
 
 def cargar_config():
-    if not os.path.exists(CONFIG_PATH):
-        return {"chat_id": None, "programacion": {}}
+    default_config = {
+        "chat_id": None,
+        "programacion": {},
+        "supabase_activo": False
+    }
+
     try:
+        if not os.path.exists(CONFIG_PATH):
+            return default_config
+
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, dict) else {"chat_id": None, "programacion": {}}
+            contenido = f.read().strip()
+
+            if not contenido:
+                return default_config
+
+            data = json.loads(contenido)
+
+            # Asegurar campos mínimos
+            for k, v in default_config.items():
+                if k not in data:
+                    data[k] = v
+
+            return data
+
     except:
-        return {"chat_id": None, "programacion": {}}
+        return default_config
 
 def guardar_config(config):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -184,7 +297,7 @@ def configurar_programacion_consola():
 # TELEGRAM
 # ============================================================
 
-TELEGRAM_TOKEN = ""
+TELEGRAM_TOKEN = "8488886057:AAH8PkpvspCgwGWNY4ImAKgJ7bf58fzpzjo"
 
 def cargar_chat_id():
     return cargar_config().get("chat_id")
@@ -777,7 +890,7 @@ def abrir_reporte(filepath):
 
 def ejecutar_analisis(historial):
     """Ejecuta un análisis completo y genera reporte"""
-    
+    print("🔥 DEBUG → entrando en ejecutar_analisis")
     cpu = psutil.cpu_percent(interval=1)
     ram = psutil.virtual_memory().percent
     procesos = analizar_procesos()
@@ -804,7 +917,7 @@ def ejecutar_analisis(historial):
     guardar_historial(historial)
 
     # Guardar reporte HTML
-    filepath_reporte = guardar_reporte(snapshot)
+    filepath_reporte = guardar_reporte_pdf(snapshot)
 
     # Enviar a Telegram si está configurado
     if telegram_configurado():
@@ -830,9 +943,11 @@ def ejecutar_analisis(historial):
 
         # Subir a Supabase si está activado
     if supabase_configurado():
-        exito = subir_reporte_supabase(snapshot)
+        print("🔥 DEBUG → supabase_configurado =", supabase_configurado())
+        exito = subir_snapshot_a_storage(snapshot)
         if exito:
             print("✔ Reporte subido a Supabase.")
+           
         else:
             print("❌ Error al subir reporte a Supabase.")
     return filepath_reporte
@@ -893,7 +1008,9 @@ def main():
         print("1) Ejecutar análisis ahora")
         print("2) Iniciar modo automático")
         print("3) Configurar programación")
-        print("4) Salir")
+        print("4) Registrarse")
+        print("5) Iniciar sesión")
+        print("6) Salir")
         
 
 
@@ -910,11 +1027,16 @@ def main():
         elif opcion == "3":
             configurar_programacion_consola()
 
+
         elif opcion == "4":
+            registrar_usuario()
+
+        elif opcion == "5":
+            login_usuario()
+        
+        elif opcion == "6":
             print("Saliendo...")
             break
-
-        
 
 
         else:

@@ -8,7 +8,23 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QTimeEdit, QSpinBox, QGridLayout
 )
 from PyQt5.QtCore import Qt, QTime
+from PyQt5.QtWidgets import QWidget, QMessageBox, QInputDialog
+
 import prismov
+
+
+# ============================
+# SUPABASE AUTH (NUEVO)
+# ============================
+
+from supabase import create_client
+
+SUPABASE_URL = "https://ejtmmwqhetlhwihxejdu.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqdG1td3FoZXRsaHdpaHhlamR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzIxMjAsImV4cCI6MjA4NzAwODEyMH0.nX6mfYsecLuKaNCIm4PMbe94Ygmc1CTgzNxV6MipiK8"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+usuario_actual = None
 
 
 # ============================================================
@@ -218,6 +234,90 @@ class PrismovGUI(QWidget):
 
         self.update_telegram_status()
         self.apply_theme()
+        self.historial = prismov.cargar_historial()
+                # ============================
+        # AUTENTICACIÓN SUPABASE (NUEVO)
+        # ============================
+
+        self.label_usuario = QLabel("🔐 No has iniciado sesión")
+        self.label_usuario.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label_usuario)
+
+        self.btn_registro = QPushButton("📝 Registrarse")
+        self.btn_registro.clicked.connect(self.registro_gui)
+        layout.addWidget(self.btn_registro)
+
+        self.btn_login = QPushButton("🔑 Iniciar sesión")
+        self.btn_login.clicked.connect(self.login_gui)
+        layout.addWidget(self.btn_login)
+
+        self.btn_logout_supabase = QPushButton("🚪 Cerrar sesión Supabase")
+        self.btn_logout_supabase.clicked.connect(self.logout_supabase)
+        layout.addWidget(self.btn_logout_supabase)
+
+    # ============================================================
+    # AUTENTICACIÓN SUPABASE (NUEVO)
+    # ============================================================
+
+    def registro_gui(self):
+        global usuario_actual
+
+        email, ok1 = QInputDialog.getText(self, "Registro", "Introduce email:")
+        if not ok1 or not email:
+            return
+
+        password, ok2 = QInputDialog.getText(self, "Registro", "Introduce contraseña:")
+        if not ok2 or not password:
+            return
+
+        try:
+            response = supabase.auth.sign_up({
+                "email": email,
+                "password": password
+            })
+
+            if response.user:
+                QMessageBox.information(self, "✔ Registro", "Usuario registrado correctamente.\nRevisa tu correo si tienes confirmación activada.")
+            else:
+                QMessageBox.warning(self, "Error", "No se pudo registrar.")
+
+        except Exception as e:
+            self.mostrar_error(e)
+
+    def login_gui(self):
+        global usuario_actual
+
+        email, ok1 = QInputDialog.getText(self, "Login", "Introduce email:")
+        if not ok1 or not email:
+            return
+
+        password, ok2 = QInputDialog.getText(self, "Login", "Introduce contraseña:")
+        if not ok2 or not password:
+            return
+
+        try:
+            response = supabase.auth.sign_in_with_password({
+                "email": email,
+                "password": password
+            })
+
+            if response.user:
+                usuario_actual = response.user
+                prismov.usuario_actual = usuario_actual
+                self.label_usuario.setText(f"✔ Sesión iniciada: {email}")
+                QMessageBox.information(self, "✔ Login", "Inicio de sesión correcto.")
+            else:
+                QMessageBox.warning(self, "Error", "Credenciales incorrectas.")
+
+        except Exception as e:
+            self.mostrar_error(e)
+
+    def logout_supabase(self):
+        global usuario_actual
+        usuario_actual = None
+        prismov.usuario_actual = None
+        self.label_usuario.setText("🔐 No has iniciado sesión")
+        QMessageBox.information(self, "Sesión cerrada", "Has cerrado sesión correctamente.")
 
     # ============================================================
     # ESTILO PROFESIONAL + ANIMACIONES
@@ -354,6 +454,12 @@ class PrismovGUI(QWidget):
                                     "¿Deseas abrir el reporte?",
                                     QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
                 prismov.abrir_reporte(filepath_reporte)
+            
+                global usuario_actual
+
+            if not usuario_actual:
+                QMessageBox.warning(self, "Login requerido", "Debes iniciar sesión primero.")
+            return
 
         except Exception as e:
             self.mostrar_error(e)
