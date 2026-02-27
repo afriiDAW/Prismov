@@ -46,40 +46,37 @@ def desactivar_supabase():
     config["supabase_activo"] = False
     guardar_config(config)
 
-
 def subir_snapshot_a_storage(snapshot):
     global usuario_actual
-
     if not usuario_actual:
         print("⚠ No hay usuario logueado.")
         return False
-
     try:
-        import datetime
-
+        html_reporte = generar_reporte_html(snapshot)
         ts = snapshot.get("timestamp") or datetime.datetime.now().isoformat()
         safe_ts = ts.replace(":", "-").replace(" ", "_")
+        filename = f"reporte_{safe_ts}.html"
 
-        filename = f"{usuario_actual.id}_{safe_ts}.json"
-
-        # JSON → bytes
-        file_bytes = json.dumps(snapshot, ensure_ascii=False, indent=2).encode("utf-8")
-
-        # Upload simple (sin file_options)
-        username = cargar_config().get("username")
-
+        # Corrección para el error de 'list' en el username
+        username_data = cargar_config().get("username")
+        username = username_data[0] if isinstance(username_data, list) else username_data
+        
         user_folder = f"reportes/{username}"
 
+        # CRUCIAL: 'content-type' para que el navegador renderice el HTML
+        # Usamos 'x-upsert': 'true' para permitir sobrescribir si fuera necesario
         resp = supabase.storage.from_("prismov-reportes").upload(
-        path=f"{user_folder}/{filename}",
-        file=file_bytes
-        
+            path=f"{user_folder}/{filename}",
+            file=html_reporte.encode("utf-8"),
+            file_options={
+                "content-type": "text/html",
+                "x-upsert": "true"
+            }
         )
-        print("✅ Subido a Storage:", resp)
+        print(f"✅ Reporte renderizable subido: {filename}")
         return True
-
     except Exception as e:
-        print("❌ ERROR SUBIENDO A STORAGE:", repr(e))
+        print("❌ ERROR AL SUBIR (MIME TYPE):", repr(e))
         return False
 
 def abrir_directorio_supabase():
@@ -867,56 +864,29 @@ import webbrowser
 from tkinter import messagebox, simpledialog, Tk, Listbox, Button, SINGLE
 
 def abrir_reportes_nube():
-    config_user = cargar_config().get("username")
-    
-    # Asegurarnos de que username sea string (por el error anterior)
-    if isinstance(config_user, list):
-        username = config_user[0]
-    else:
-        username = config_user
-
-    if not username:
-        return False
-
+    username_data = cargar_config().get("username")
+    username = username_data[0] if isinstance(username_data, list) else username_data
+    if not username: return
     try:
-        # 1. Listar los archivos en la carpeta del usuario
-        # Nota: Asegúrate de tener configurado tu cliente 'supabase' previamente
         response = supabase.storage.from_('prismov-reportes').list(f'reportes/{username}')
-
-        if not response:
-            print("No se encontraron archivos.")
-            return False
-
-        # 2. Crear una ventanita rápida para elegir el archivo
-        def seleccionar_y_abrir():
-            seleccion = lista.curselection()
-            if seleccion:
-                archivo_nombre = lista.get(seleccion[0])
-                # Construir la URL final del archivo seleccionado
-                url_final = f"{SUPABASE_URL}/storage/v1/object/public/prismov-reportes/reportes/{username}/{archivo_nombre}"
-                webbrowser.open(url_final)
-                root.destroy()
-
         root = Tk()
         root.title(f"Logs de {username}")
+        lista = Listbox(root, width=60, height=15, selectmode=SINGLE)
+        lista.pack(padx=20, pady=20)
         
-        lista = Listbox(root, width=50, selectmode=SINGLE)
-        lista.pack(padx=10, pady=10)
-
         for item in response:
-            # Filtramos para no mostrar la propia carpeta si aparece
-            if item['name'] != '.emptyFolderPlaceholder':
-                lista.insert('end', item['name'])
-
-        btn = Button(root, text="Abrir Log Seleccionado", command=seleccionar_y_abrir)
-        btn.pack(pady=5)
+            if item['name'] != '.emptyFolderPlaceholder': lista.insert('end', item['name'])
         
-        root.mainloop()
-        return True
+        def ver_en_browser():
+            if lista.curselection():
+                archivo = lista.get(lista.curselection()[0])
+                # Usamos la URL pública de Supabase
+                url = f"{SUPABASE_URL}/storage/v1/object/public/prismov-reportes/reportes/{username}/{archivo}"
+                webbrowser.open(url)
 
-    except Exception as e:
-        print("Error al listar o abrir nube:", e)
-        return False
+        Button(root, text="Visualizar en Navegador", command=ver_en_browser, bg="#764ba2", fg="white").pack(pady=10)
+        root.mainloop()
+    except Exception as e: print(f"Error al listar: {e}")
 
 def generar_vista_previa_html(contenido_log, nombre_archivo):
     html_template = f"""
