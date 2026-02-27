@@ -8,6 +8,57 @@ import random
 import string
 import webbrowser
 
+
+# ============================================================
+# SUPABASE
+# ============================================================
+
+SUPABASE_URL = ""
+SUPABASE_API_KEY = ""  # Usa la service_role, NO la anon
+
+def supabase_configurado():
+    config = cargar_config()
+    return config.get("supabase_activo", False)
+
+def activar_supabase():
+    config = cargar_config()
+    config["supabase_activo"] = True
+    guardar_config(config)
+
+def desactivar_supabase():
+    config = cargar_config()
+    config["supabase_activo"] = False
+    guardar_config(config)
+
+def subir_reporte_supabase(snapshot):
+    """
+    Sube el snapshot completo a Supabase
+    Requiere tabla llamada: reportes
+    """
+    try:
+        headers = {
+            "apikey": SUPABASE_API_KEY,
+            "Authorization": f"Bearer {SUPABASE_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "timestamp": snapshot["timestamp"],
+            "cpu_percent": snapshot["cpu_percent"],
+            "ram_percent": snapshot["ram_percent"],
+            "riesgo": snapshot["analisis_avanzado"]["score_detallado"]["riesgo_sistema"],
+            "snapshot_completo": snapshot
+        }
+
+        url = f"{SUPABASE_URL}/rest/v1/reportes"
+        r = requests.post(url, headers=headers, json=data)
+
+        return r.status_code in [200, 201]
+
+    except Exception as e:
+        print("Error subiendo a Supabase:", e)
+        return False
+
 # ============================================================
 # RUTAS FIJAS PARA QUE FUNCIONE EN .EXE
 # ============================================================
@@ -133,7 +184,7 @@ def configurar_programacion_consola():
 # TELEGRAM
 # ============================================================
 
-TELEGRAM_TOKEN = "#####"
+TELEGRAM_TOKEN = ""
 
 def cargar_chat_id():
     return cargar_config().get("chat_id")
@@ -776,7 +827,14 @@ def ejecutar_analisis(historial):
 💾 Reporte completo guardado localmente.
         """
         enviar_telegram(mensaje)
-    
+
+        # Subir a Supabase si está activado
+    if supabase_configurado():
+        exito = subir_reporte_supabase(snapshot)
+        if exito:
+            print("✔ Reporte subido a Supabase.")
+        else:
+            print("❌ Error al subir reporte a Supabase.")
     return filepath_reporte
 
 
