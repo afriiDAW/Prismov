@@ -254,6 +254,9 @@ class PrismovGUI(QWidget):
         self.btn_logout_supabase = QPushButton("🚪 Cerrar sesión Supabase")
         self.btn_logout_supabase.clicked.connect(self.logout_supabase)
         layout.addWidget(self.btn_logout_supabase)
+        self.btn_nube = QPushButton("☁ Ver reportes en la nube")
+        self.btn_nube.clicked.connect(prismov.abrir_reportes_nube)
+        layout.addWidget(self.btn_nube)
 
     # ============================================================
     # AUTENTICACIÓN SUPABASE (NUEVO)
@@ -440,26 +443,28 @@ class PrismovGUI(QWidget):
     # ============================================================
     # LÓGICA (SIN CAMBIOS)
     # ============================================================
-
     def ejecutar_analisis(self):
+        global usuario_actual
+
+        if not usuario_actual:
+            QMessageBox.warning(self, "Login requerido", "Debes iniciar sesión primero.")
+            return
+
         try:
             filepath_reporte = prismov.ejecutar_analisis(self.historial)
+
             self.ultima_ruta_reporte = filepath_reporte
 
             self.texto.append("✔ Análisis ejecutado correctamente.\n")
-            self.texto.append("RA: 2e) Implicación THD\n")
-            self.texto.append(f"📄 Reporte guardado: {filepath_reporte}\n")
 
-            if QMessageBox.question(self, "✔ Análisis Completado",
-                                    "¿Deseas abrir el reporte?",
-                                    QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
+            if QMessageBox.question(
+                self,
+                "✔ Análisis Completado",
+                "¿Deseas abrir el reporte?",
+                QMessageBox.Yes | QMessageBox.No
+            ) == QMessageBox.Yes:
+
                 prismov.abrir_reporte(filepath_reporte)
-            
-                global usuario_actual
-
-            if not usuario_actual:
-                QMessageBox.warning(self, "Login requerido", "Debes iniciar sesión primero.")
-            return
 
         except Exception as e:
             self.mostrar_error(e)
@@ -477,6 +482,24 @@ class PrismovGUI(QWidget):
                 self.ultima_ruta_reporte = reporte_reciente
             else:
                 QMessageBox.warning(self, "Error", "No hay reportes generados.")
+
+        except Exception as e:
+            self.mostrar_error(e)
+    
+    def ver_reportes_nube(self):
+        try:
+            username = prismov.cargar_config().get("username")
+
+            files = prismov.supabase.storage.from_("prismov-reportes").list(
+                f"reportes/{username}"
+            )
+
+            texto = "📂 Reportes nube:\n"
+
+            for f in files:
+                texto += f"• {f['name']}\n"
+
+            self.texto.append(texto)
 
         except Exception as e:
             self.mostrar_error(e)

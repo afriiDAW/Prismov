@@ -9,7 +9,10 @@ import string
 import webbrowser
 from supabase import create_client
 import io
-from weasyprint import HTML
+from reportlab.platypus import Paragraph, SimpleDocTemplate
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.pdfbase import pdfmetrics
 
 
 # ============================================================
@@ -23,22 +26,6 @@ supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
 
 usuario_actual = None
 
-def guardar_reporte_pdf(snapshot):
-    html = generar_reporte_html(snapshot)
-
-    username = cargar_config().get("username")
-
-    REPORTES_DIR = os.path.join(DATA_DIR, "reportes")
-    os.makedirs(REPORTES_DIR, exist_ok=True)
-
-    timestamp = snapshot["timestamp"].replace(":", "-").replace(" ", "_")
-
-    filename = f"reporte_{timestamp}.pdf"
-    filepath = os.path.join(REPORTES_DIR, filename)
-
-    HTML(string=html).write_pdf(filepath)
-
-    return filepath
 
 def supabase_configurado():
     global usuario_actual
@@ -876,6 +863,84 @@ def guardar_reporte(snapshot):
     
     return filepath
 
+import webbrowser
+from tkinter import messagebox, simpledialog, Tk, Listbox, Button, SINGLE
+
+def abrir_reportes_nube():
+    config_user = cargar_config().get("username")
+    
+    # Asegurarnos de que username sea string (por el error anterior)
+    if isinstance(config_user, list):
+        username = config_user[0]
+    else:
+        username = config_user
+
+    if not username:
+        return False
+
+    try:
+        # 1. Listar los archivos en la carpeta del usuario
+        # Nota: Asegúrate de tener configurado tu cliente 'supabase' previamente
+        response = supabase.storage.from_('prismov-reportes').list(f'reportes/{username}')
+
+        if not response:
+            print("No se encontraron archivos.")
+            return False
+
+        # 2. Crear una ventanita rápida para elegir el archivo
+        def seleccionar_y_abrir():
+            seleccion = lista.curselection()
+            if seleccion:
+                archivo_nombre = lista.get(seleccion[0])
+                # Construir la URL final del archivo seleccionado
+                url_final = f"{SUPABASE_URL}/storage/v1/object/public/prismov-reportes/reportes/{username}/{archivo_nombre}"
+                webbrowser.open(url_final)
+                root.destroy()
+
+        root = Tk()
+        root.title(f"Logs de {username}")
+        
+        lista = Listbox(root, width=50, selectmode=SINGLE)
+        lista.pack(padx=10, pady=10)
+
+        for item in response:
+            # Filtramos para no mostrar la propia carpeta si aparece
+            if item['name'] != '.emptyFolderPlaceholder':
+                lista.insert('end', item['name'])
+
+        btn = Button(root, text="Abrir Log Seleccionado", command=seleccionar_y_abrir)
+        btn.pack(pady=5)
+        
+        root.mainloop()
+        return True
+
+    except Exception as e:
+        print("Error al listar o abrir nube:", e)
+        return False
+
+def generar_vista_previa_html(contenido_log, nombre_archivo):
+    html_template = f"""
+    <html>
+    <head>
+        <title>Log: {nombre_archivo}</title>
+        <style>
+            body {{ background-color: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', monospace; padding: 20px; }}
+            .container {{ border-left: 3px solid #007acc; padding-left: 15px; white-space: pre-wrap; }}
+            h2 {{ color: #569cd6; border-bottom: 1px solid #333; padding-bottom: 10px; }}
+        </style>
+    </head>
+    <body>
+        <h2>Vista de Log: {nombre_archivo}</h2>
+        <div class="container">{contenido_log}</div>
+    </body>
+    </html>
+    """
+    # Guardar temporalmente y abrir
+    with open("temp_log.html", "w", encoding="utf-8") as f:
+        f.write(html_template)
+    
+    webbrowser.open('file://' + os.path.realpath("temp_log.html"))
+
 def abrir_reporte(filepath):
     """Abre el reporte en el navegador por defecto"""
     try:
@@ -917,7 +982,7 @@ def ejecutar_analisis(historial):
     guardar_historial(historial)
 
     # Guardar reporte HTML
-    filepath_reporte = guardar_reporte_pdf(snapshot)
+    filepath_reporte = guardar_reporte(snapshot)
 
     # Enviar a Telegram si está configurado
     if telegram_configurado():
@@ -951,6 +1016,7 @@ def ejecutar_analisis(historial):
         else:
             print("❌ Error al subir reporte a Supabase.")
     return filepath_reporte
+
 
 
 # ============================================================
