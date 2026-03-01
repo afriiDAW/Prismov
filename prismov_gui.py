@@ -359,11 +359,6 @@ class PrismovGUI(QWidget):
     # LÓGICA (SIN CAMBIOS)
     # ============================================================
     def ejecutar_analisis(self):
-        global usuario_actual
-
-        if not usuario_actual:
-            QMessageBox.warning(self, "Login requerido", "Debes iniciar sesión primero.")
-            return
 
         try:
             filepath_reporte = prismov.ejecutar_analisis(self.historial)

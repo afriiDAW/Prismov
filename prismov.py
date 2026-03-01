@@ -865,13 +865,16 @@ def main():
     # Cargar historial
     historial = cargar_historial()
 
-    # Comprobar si Telegram está configurado
+    # =============================
+    # CONFIGURAR TELEGRAM SI NO EXISTE
+    # =============================
     config = cargar_config()
 
     if config.get("chat_id") is None:
         print("\n⚠ Telegram no está configurado.")
         print("1) Abre tu bot en Telegram")
         print("2) Escríbele cualquier mensaje (por ejemplo: hola)")
+
         input("Cuando lo hayas hecho, pulsa ENTER...")
 
         chat_id = obtener_chat_id()
@@ -881,23 +884,24 @@ def main():
         else:
             print("❌ No se pudo obtener el chat_id. Telegram seguirá desactivado.")
 
-    # Menú simple
+    # =============================
+    # MENÚ PRINCIPAL (LOGIN NO OBLIGATORIO)
+    # =============================
     while True:
         print("\n--- MENÚ ---")
         print("1) Ejecutar análisis ahora")
         print("2) Iniciar modo automático")
         print("3) Configurar programación")
-        print("4) Registrarse")
-        print("5) Iniciar sesión")
-        print("6) Salir")
-        
-
+        print("4) Salir")
 
         opcion = input("Selecciona una opción: ")
 
         if opcion == "1":
-            ejecutar_analisis(historial)
-            print("✔ Análisis completado.")
+            try:
+                ejecutar_analisis(historial)
+                print("✔ Análisis completado.")
+            except Exception as e:
+                print("❌ Error al ejecutar análisis:", e)
 
         elif opcion == "2":
             print("Modo automático iniciado. Pulsa CTRL+C para detenerlo.")
@@ -905,15 +909,13 @@ def main():
 
         elif opcion == "3":
             configurar_programacion_consola()
-        
+
         elif opcion == "4":
             print("Saliendo...")
             break
 
-
         else:
             print("Opción no válida.")
-
 
 if __name__ == "__main__":
     main()
