@@ -235,92 +235,7 @@ class PrismovGUI(QWidget):
         self.update_telegram_status()
         self.apply_theme()
         self.historial = prismov.cargar_historial()
-                # ============================
-        # AUTENTICACIÓN SUPABASE (NUEVO)
-        # ============================
-
-        self.label_usuario = QLabel("🔐 No has iniciado sesión")
-        self.label_usuario.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label_usuario)
-
-        self.btn_registro = QPushButton("📝 Registrarse")
-        self.btn_registro.clicked.connect(self.registro_gui)
-        layout.addWidget(self.btn_registro)
-
-        self.btn_login = QPushButton("🔑 Iniciar sesión")
-        self.btn_login.clicked.connect(self.login_gui)
-        layout.addWidget(self.btn_login)
-
-        self.btn_logout_supabase = QPushButton("🚪 Cerrar sesión Supabase")
-        self.btn_logout_supabase.clicked.connect(self.logout_supabase)
-        layout.addWidget(self.btn_logout_supabase)
-        self.btn_nube = QPushButton("☁ Ver reportes en la nube")
-        self.btn_nube.clicked.connect(prismov.abrir_reportes_nube)
-        layout.addWidget(self.btn_nube)
-
-    # ============================================================
-    # AUTENTICACIÓN SUPABASE (NUEVO)
-    # ============================================================
-
-    def registro_gui(self):
-        global usuario_actual
-
-        email, ok1 = QInputDialog.getText(self, "Registro", "Introduce email:")
-        if not ok1 or not email:
-            return
-
-        password, ok2 = QInputDialog.getText(self, "Registro", "Introduce contraseña:")
-        if not ok2 or not password:
-            return
-
-        try:
-            response = supabase.auth.sign_up({
-                "email": email,
-                "password": password
-            })
-
-            if response.user:
-                QMessageBox.information(self, "✔ Registro", "Usuario registrado correctamente.\nRevisa tu correo si tienes confirmación activada.")
-            else:
-                QMessageBox.warning(self, "Error", "No se pudo registrar.")
-
-        except Exception as e:
-            self.mostrar_error(e)
-
-    def login_gui(self):
-        global usuario_actual
-
-        email, ok1 = QInputDialog.getText(self, "Login", "Introduce email:")
-        if not ok1 or not email:
-            return
-
-        password, ok2 = QInputDialog.getText(self, "Login", "Introduce contraseña:")
-        if not ok2 or not password:
-            return
-
-        try:
-            response = supabase.auth.sign_in_with_password({
-                "email": email,
-                "password": password
-            })
-
-            if response.user:
-                usuario_actual = response.user
-                prismov.usuario_actual = usuario_actual
-                self.label_usuario.setText(f"✔ Sesión iniciada: {email}")
-                QMessageBox.information(self, "✔ Login", "Inicio de sesión correcto.")
-            else:
-                QMessageBox.warning(self, "Error", "Credenciales incorrectas.")
-
-        except Exception as e:
-            self.mostrar_error(e)
-
-    def logout_supabase(self):
-        global usuario_actual
-        usuario_actual = None
-        prismov.usuario_actual = None
-        self.label_usuario.setText("🔐 No has iniciado sesión")
-        QMessageBox.information(self, "Sesión cerrada", "Has cerrado sesión correctamente.")
+ 
 
     # ============================================================
     # ESTILO PROFESIONAL + ANIMACIONES
@@ -486,23 +401,6 @@ class PrismovGUI(QWidget):
         except Exception as e:
             self.mostrar_error(e)
     
-    def ver_reportes_nube(self):
-        try:
-            username = prismov.cargar_config().get("username")
-
-            files = prismov.supabase.storage.from_("prismov-reportes").list(
-                f"reportes/{username}"
-            )
-
-            texto = "📂 Reportes nube:\n"
-
-            for f in files:
-                texto += f"• {f['name']}\n"
-
-            self.texto.append(texto)
-
-        except Exception as e:
-            self.mostrar_error(e)
 
     def configurar_telegram(self):
         chat_id, codigo_valido = prismov.obtener_chat_id_y_validar_codigo()

@@ -7,133 +7,11 @@ import requests
 import random
 import string
 import webbrowser
-from supabase import create_client
 import io
 from reportlab.platypus import Paragraph, SimpleDocTemplate
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.pdfbase import pdfmetrics
-
-
-# ============================================================
-# SUPABASE
-# ============================================================
-
-SUPABASE_URL = "https://ejtmmwqhetlhwihxejdu.supabase.co"
-SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqdG1td3FoZXRsaHdpaHhlamR1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTQzMjEyMCwiZXhwIjoyMDg3MDA4MTIwfQ.gK6H0XdiPe9UbL_4VedDjbSmRhoft22Z7gE-uY6hP_M"  # Usa la service_role, NO la anon
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqdG1td3FoZXRsaHdpaHhlamR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzIxMjAsImV4cCI6MjA4NzAwODEyMH0.nX6mfYsecLuKaNCIm4PMbe94Ygmc1CTgzNxV6MipiK8"
-supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
-
-usuario_actual = None
-
-
-def supabase_configurado():
-    global usuario_actual
-    config = cargar_config()
-
-    return (
-        usuario_actual is not None and
-        config.get("supabase_activo", False)
-    )
-
-def activar_supabase():
-    config = cargar_config()
-    config["supabase_activo"] = True
-    guardar_config(config)
-
-def desactivar_supabase():
-    config = cargar_config()
-    config["supabase_activo"] = False
-    guardar_config(config)
-
-def subir_snapshot_a_storage(snapshot):
-    global usuario_actual
-    if not usuario_actual:
-        print("⚠ No hay usuario logueado.")
-        return False
-    try:
-        html_reporte = generar_reporte_html(snapshot)
-        ts = snapshot.get("timestamp") or datetime.datetime.now().isoformat()
-        safe_ts = ts.replace(":", "-").replace(" ", "_")
-        filename = f"reporte_{safe_ts}.html"
-
-        # Corrección para el error de 'list' en el username
-        username_data = cargar_config().get("username")
-        username = username_data[0] if isinstance(username_data, list) else username_data
-        
-        user_folder = f"reportes/{username}"
-
-        # CRUCIAL: 'content-type' para que el navegador renderice el HTML
-        # Usamos 'x-upsert': 'true' para permitir sobrescribir si fuera necesario
-        resp = supabase.storage.from_("prismov-reportes").upload(
-            path=f"{user_folder}/{filename}",
-            file=html_reporte.encode("utf-8"),
-            file_options={
-                "content-type": "text/html",
-                "x-upsert": "true"
-            }
-        )
-        print(f"✅ Reporte renderizable subido: {filename}")
-        return True
-    except Exception as e:
-        print("❌ ERROR AL SUBIR (MIME TYPE):", repr(e))
-        return False
-
-def abrir_directorio_supabase():
-    username = cargar_config().get("username")
-
-    url = supabase.storage.from_("prismov-reportes").get_public_url(
-        f"reportes/{username}/"
-    )
-
-    webbrowser.open(url)
-    
-def registrar_usuario():
-    global usuario_actual
-
-    email = input("Email: ")
-    password = input("Password: ")
-
-    response = supabase.auth.sign_up({
-        "email": email,
-        "password": password
-    })
-
-    if response.user:
-        print("✔ Usuario registrado.")
-    else:
-        print("❌ Error al registrar.")
-
-
-def login_usuario():
-    global usuario_actual
-
-    email = input("Email: ")
-    password = input("Password: ")
-
-    response = supabase.auth.sign_in_with_password({
-        "email": email,
-        "password": password
-    })
-
-    if response.user:
-        usuario_actual = response.user
-
-        # ⭐ Crear username simple desde email
-        username = email.split("@")[0]
-
-        # ⭐ Guardar en config.json
-        config = cargar_config()
-        config["username"] = username
-        config["supabase_activo"] = True
-        guardar_config(config)
-
-        print("✔ Login correcto.")
-    else:
-        print("❌ Credenciales incorrectas.")
-
-
-
 
 
 
@@ -281,7 +159,7 @@ def configurar_programacion_consola():
 # TELEGRAM
 # ============================================================
 
-TELEGRAM_TOKEN = "8488886057:AAH8PkpvspCgwGWNY4ImAKgJ7bf58fzpzjo"
+TELEGRAM_TOKEN = ""
 
 def cargar_chat_id():
     return cargar_config().get("chat_id")
@@ -860,15 +738,7 @@ def guardar_reporte(snapshot):
     
     return filepath
 
-import webbrowser
-from tkinter import messagebox, simpledialog, Tk, Listbox, Button, SINGLE
 
-def abrir_reportes_nube():
-    import webbrowser
-    
-    url = "https://supabase.com/dashboard/project/ejtmmwqhetlhwihxejdu/storage/buckets/prismov-reportes"
-    
-    webbrowser.open(url)
 
 def generar_vista_previa_html(contenido_log, nombre_archivo):
     html_template = f"""
@@ -958,15 +828,6 @@ def ejecutar_analisis(historial):
         """
         enviar_telegram(mensaje)
 
-        # Subir a Supabase si está activado
-    if supabase_configurado():
-        print("🔥 DEBUG → supabase_configurado =", supabase_configurado())
-        exito = subir_snapshot_a_storage(snapshot)
-        if exito:
-            print("✔ Reporte subido a Supabase.")
-           
-        else:
-            print("❌ Error al subir reporte a Supabase.")
     return filepath_reporte
 
 
@@ -1044,15 +905,8 @@ def main():
 
         elif opcion == "3":
             configurar_programacion_consola()
-
-
-        elif opcion == "4":
-            registrar_usuario()
-
-        elif opcion == "5":
-            login_usuario()
         
-        elif opcion == "6":
+        elif opcion == "4":
             print("Saliendo...")
             break
 
